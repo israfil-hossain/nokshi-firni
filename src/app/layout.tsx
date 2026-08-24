@@ -73,23 +73,23 @@ export default function RootLayout({
         <html lang="bn">
             <head>
                 <StructuredData />
+                <Script
+                    src="https://www.googletagmanager.com/gtag/js?id=G-G0S8BJ2SL0"
+                    strategy="afterInteractive"
+                />
+                <Script id="google-analytics" strategy="afterInteractive">
+                    {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'G-G0S8BJ2SL0');
+                    `}
+                </Script>
             </head>
             <body className="min-h-screen bg-cream text-dark antialiased font-bangla">
                 <Toaster richColors position="top-right" />
                 {children}
             </body>
-            <Script
-                src="https://www.googletagmanager.com/gtag/js?id=G-G0S8BJ2SL0"
-                strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-                {`
-                    window.dataLayer = window.dataLayer || [];
-                    function gtag(){dataLayer.push(arguments);}
-                    gtag('js', new Date());
-                    gtag('config', 'G-G0S8BJ2SL0');
-                `}
-            </Script>
         </html>
     );
 };
