@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Truck, Gift, MessageCircle, AlertCircle, User, Phone, MapPin, CheckCircle } from 'lucide-react';
-import { Order, PRODUCTS, calculateTotal, getMinOrderWarning, formatPriceEn } from '@/lib/calculations';
+import { Order, PRODUCTS, calculateTotal, getMinOrderWarning, formatPriceEn, getUnitPrice, getDiscountPercentage } from '@/lib/calculations';
 import { getOrderWhatsAppLink, BKASH_NUMBER, CustomerInfo } from '@/lib/whatsapp';
 
 interface OrderSummaryProps {
@@ -123,25 +123,36 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
                             {/* Order items */}
                             <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                                 <AnimatePresence>
-                                    {orderItems.map(product => (
-                                        <motion.div
-                                            key={product.id}
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100"
-                                        >
-                                            <div>
-                                                <p className="font-medium text-dark text-sm sm:text-base">{product.name}</p>
-                                                <p className="text-xs sm:text-sm text-dark-light">
-                                                    {order[product.id]} {product.unit} × {formatPriceEn(product.price)}
+                                    {orderItems.map(product => {
+                                        const qty = order[product.id];
+                                        const unitPrice = getUnitPrice(product, qty);
+                                        const discount = getDiscountPercentage(product, qty);
+                                        const itemTotal = qty * unitPrice;
+                                        return (
+                                            <motion.div
+                                                key={product.id}
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100"
+                                            >
+                                                <div>
+                                                    <p className="font-medium text-dark text-sm sm:text-base">{product.name}</p>
+                                                    <p className="text-xs sm:text-sm text-dark-light">
+                                                        {qty} {product.unit} × {formatPriceEn(unitPrice)}
+                                                        {discount && (
+                                                            <span className="ml-1 text-maroon font-medium">
+                                                                ({discount}% ছাড়)
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                <p className="font-semibold text-dark text-sm sm:text-base">
+                                                    {formatPriceEn(itemTotal)}
                                                 </p>
-                                            </div>
-                                            <p className="font-semibold text-dark text-sm sm:text-base">
-                                                {formatPriceEn(order[product.id] * product.price)}
-                                            </p>
-                                        </motion.div>
-                                    ))}
+                                            </motion.div>
+                                        );
+                                    })}
                                 </AnimatePresence>
                             </div>
 
@@ -174,7 +185,7 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
                                 >
                                     <p className="font-medium">ফ্রি ডেলিভারি পান!</p>
                                     <p className="text-xs mt-1">
-                                        ১৫০গ্রা: ৬০+ কাপ | ৫০০গ্রা: ২০+ বক্স | ১কেজি: ১০+ বক্স
+                                        ১০০গ্রা: ৫০+ কাপ | ৫০০গ্রা: ১০+ বক্স | ১কেজি: ৫+ বক্স
                                     </p>
                                 </motion.div>
                             )}

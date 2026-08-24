@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Minus, Plus, AlertCircle } from 'lucide-react';
-import { Product, formatPriceEn } from '@/lib/calculations';
+import { Minus, Plus, AlertCircle, Percent } from 'lucide-react';
+import { Product, formatPriceEn, getUnitPrice, getDiscountPercentage } from '@/lib/calculations';
 
 interface ProductCardProps {
     product: Product;
@@ -16,6 +16,10 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
     const isBelowMin = quantity > 0 && quantity < product.minOrder;
     const isAtFreeDelivery = quantity >= product.freeDeliveryThreshold;
     const [inputValue, setInputValue] = useState(quantity.toString());
+
+    const unitPrice = getUnitPrice(product, quantity);
+    const discountPct = getDiscountPercentage(product, quantity);
+    const hasBulkDiscount = discountPct !== null;
 
     useEffect(() => {
         setInputValue(quantity.toString());
@@ -61,22 +65,34 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                 isBelowMin ? 'border-red-300' : isAtFreeDelivery ? 'border-green-300' : 'border-maroon/20'
             }`}
         >
-            {/* Free delivery badge */}
-            {isAtFreeDelivery && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full inline-block mb-3 sm:mb-4"
-                >
-                    🎉 ফ্রি ডেলিভারি!
-                </motion.div>
-            )}
+            {/* Badges row */}
+            <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
+                {isAtFreeDelivery && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full"
+                    >
+                        🎉 ফ্রি ডেলিভারি!
+                    </motion.div>
+                )}
+                {hasBulkDiscount && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-maroon text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"
+                    >
+                        <Percent size={10} />
+                        {discountPct}% ছাড় ({product.bulkPricing!.minQty}+ {product.unit})
+                    </motion.div>
+                )}
+            </div>
 
             {/* Product image */}
             <div className="flex justify-center mb-4">
                 <div className="relative">
                     <Image
-                        src="/biyebari.png"
+                        src={product.image}
                         alt={product.nameEn}
                         width={160}
                         height={160}
@@ -91,8 +107,25 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
 
             {/* Price */}
             <div className="mb-4 sm:mb-6">
-                <span className="text-2xl sm:text-3xl font-bold text-maroon">{formatPriceEn(product.price)}</span>
-                <span className="text-sm sm:text-base text-dark-light">/{product.unit}</span>
+                {hasBulkDiscount ? (
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-2xl sm:text-3xl font-bold text-maroon">{formatPriceEn(unitPrice)}</span>
+                        {unitPrice < product.price && (
+                            <span className="text-base sm:text-lg text-dark-light line-through">{formatPriceEn(product.price)}</span>
+                        )}
+                        <span className="text-sm sm:text-base text-dark-light">/{product.unit}</span>
+                    </div>
+                ) : (
+                    <div>
+                        <span className="text-2xl sm:text-3xl font-bold text-maroon">{formatPriceEn(product.price)}</span>
+                        <span className="text-sm sm:text-base text-dark-light">/{product.unit}</span>
+                    </div>
+                )}
+                {hasBulkDiscount && product.bulkPricing && (
+                    <p className="text-xs text-maroon font-medium mt-1">
+                        {product.bulkPricing.minQty}+ {product.unit} অর্ডারে {formatPriceEn(product.bulkPricing.price)}/{product.unit}
+                    </p>
+                )}
             </div>
 
             {/* Min order info */}

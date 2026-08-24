@@ -1,60 +1,90 @@
+export interface BulkPricing {
+    minQty: number;
+    price: number;
+}
+
 export interface Product {
-    id: '150gm' | '500gm' | '1kg';
+    id: '100gm' | '500gm' | '1kg';
     name: string;
     nameEn: string;
     price: number;
+    bulkPricing?: BulkPricing;
     minOrder: number;
     freeDeliveryThreshold: number;
     unit: string;
+    image: string;
 }
 
 export const PRODUCTS: Product[] = [
     {
-        id: '150gm',
-        name: '১৫০ গ্রাম ফিরনি',
-        nameEn: '150gm Firni',
-        price: 30,
-        minOrder: 20,
-        freeDeliveryThreshold: 60,
+        id: '100gm',
+        name: '১০০ গ্রাম ফিরনি',
+        nameEn: '100gm Firni',
+        price: 40,
+        bulkPricing: { minQty: 100, price: 35 },
+        minOrder: 10,
+        freeDeliveryThreshold: 50,
         unit: 'কাপ',
+        image: '/100g_cup.jpeg',
     },
     {
         id: '500gm',
         name: '৫০০ গ্রাম ফিরনি',
         nameEn: '500gm Firni',
-        price: 100,
+        price: 200,
+        bulkPricing: { minQty: 10, price: 180 },
         minOrder: 5,
-        freeDeliveryThreshold: 20,
+        freeDeliveryThreshold: 10,
         unit: 'বক্স',
+        image: '/500g_cup.jpeg',
     },
     {
         id: '1kg',
         name: '১ কেজি ফিরনি',
         nameEn: '1kg Firni',
-        price: 200,
-        minOrder: 3,
-        freeDeliveryThreshold: 10,
+        price: 400,
+        bulkPricing: { minQty: 2, price: 380 },
+        minOrder: 2,
+        freeDeliveryThreshold: 5,
         unit: 'বক্স',
+        image: '/1kg_cup.jpeg',
     },
 ];
 
 export const DELIVERY_CHARGE = 80;
 
 export interface Order {
-    '150gm': number;
+    '100gm': number;
     '500gm': number;
     '1kg': number;
 }
 
 export const INITIAL_ORDER: Order = {
-    '150gm': 0,
+    '100gm': 0,
     '500gm': 0,
     '1kg': 0,
 };
 
+export function getUnitPrice(product: Product, quantity: number): number {
+    if (product.bulkPricing && quantity >= product.bulkPricing.minQty) {
+        return product.bulkPricing.price;
+    }
+    return product.price;
+}
+
+export function getDiscountPercentage(product: Product, quantity: number): number | null {
+    if (product.bulkPricing && quantity >= product.bulkPricing.minQty) {
+        const savings = product.price - product.bulkPricing.price;
+        return Math.round((savings / product.price) * 100);
+    }
+    return null;
+}
+
 export function calculateSubtotal(order: Order): number {
     return PRODUCTS.reduce((total, product) => {
-        return total + (order[product.id] * product.price);
+        const qty = order[product.id];
+        const unitPrice = getUnitPrice(product, qty);
+        return total + (qty * unitPrice);
     }, 0);
 }
 

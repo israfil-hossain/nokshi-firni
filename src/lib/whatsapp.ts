@@ -1,4 +1,4 @@
-import { Order, PRODUCTS, calculateTotal, formatPriceEn } from './calculations';
+import { Order, PRODUCTS, calculateTotal, formatPriceEn, getUnitPrice } from './calculations';
 
 export const WHATSAPP_NUMBER = '8801723560254';
 export const BKASH_NUMBER = '01843566251';
@@ -29,8 +29,9 @@ export function generateOrderMessage(order: Order, customer: CustomerInfo): stri
     PRODUCTS.forEach(product => {
         const qty = order[product.id];
         if (qty > 0) {
-            const itemTotal = qty * product.price;
-            message += `${product.nameEn}: ${qty} ${product.unit} × ${formatPriceEn(product.price)} = ${formatPriceEn(itemTotal)}\n`;
+            const unitPrice = getUnitPrice(product, qty);
+            const itemTotal = qty * unitPrice;
+            message += `${product.nameEn}: ${qty} ${product.unit} × ${formatPriceEn(unitPrice)} = ${formatPriceEn(itemTotal)}\n`;
         }
     });
 
