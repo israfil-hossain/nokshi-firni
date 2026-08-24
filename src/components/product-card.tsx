@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Minus, Plus, AlertCircle, Percent } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Minus, Plus, AlertCircle, Percent, Truck, Tag } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { Product, formatPriceEn, getUnitPrice, getDiscountPercentage } from '@/lib/calculations';
 
 interface ProductCardProps {
@@ -15,11 +16,50 @@ interface ProductCardProps {
 export default function ProductCard({ product, quantity, onQuantityChange }: ProductCardProps) {
     const isBelowMin = quantity > 0 && quantity < product.minOrder;
     const isAtFreeDelivery = quantity >= product.freeDeliveryThreshold;
+    const hasBulkDiscount = product.bulkPricing && quantity >= product.bulkPricing.minQty;
     const [inputValue, setInputValue] = useState(quantity.toString());
+    const cardRef = useRef<HTMLDivElement>(null);
+    const prevFreeDelivery = useRef(isAtFreeDelivery);
 
     const unitPrice = getUnitPrice(product, quantity);
     const discountPct = getDiscountPercentage(product, quantity);
-    const hasBulkDiscount = discountPct !== null;
+    const savingsPerUnit = product.bulkPricing ? product.price - product.bulkPricing.price : 0;
+    const totalSavings = hasBulkDiscount ? quantity * savingsPerUnit : 0;
+
+    // Progress toward bulk discount
+    const bulkProgress = product.bulkPricing
+        ? Math.min((quantity / product.bulkPricing.minQty) * 100, 100)
+        : 0;
+    const bulkRemaining = product.bulkPricing
+        ? Math.max(product.bulkPricing.minQty - quantity, 0)
+        : 0;
+
+    // Progress toward free delivery
+    const deliveryProgress = Math.min((quantity / product.freeDeliveryThreshold) * 100, 100);
+    const deliveryRemaining = Math.max(product.freeDeliveryThreshold - quantity, 0);
+
+    // Confetti when free delivery is achieved
+    useEffect(() => {
+        if (isAtFreeDelivery && !prevFreeDelivery.current && cardRef.current) {
+            const rect = cardRef.current.getBoundingClientRect();
+            const x = (rect.left + rect.width / 2) / window.innerWidth;
+            const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+            confetti({
+                particleCount: 80,
+                spread: 60,
+                origin: { x, y },
+                colors: ['#4d191c', '#C9A227', '#25D366', '#E0B830'],
+                disableForReducedMotion: true,
+            });
+        }
+        prevFreeDelivery.current = isAtFreeDelivery;
+    }, [isAtFreeDelivery]);
+
+    // Pulsing border when close to threshold (>=80%)
+    const isCloseToFreeDelivery = deliveryProgress >= 80 && deliveryProgress < 100;
+    const isCloseToBulk = product.bulkPricing && bulkProgress >= 80 && bulkProgress < 100;
+    const shouldPulse = isCloseToFreeDelivery || isCloseToBulk;
 
     useEffect(() => {
         setInputValue(quantity.toString());
@@ -57,23 +97,44 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
 
     return (
         <motion.div
+            ref={cardRef}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className={`bg-white rounded-2xl p-4 sm:p-6 shadow-lg card-hover border-2 transition-all overflow-hidden ${
-                isBelowMin ? 'border-red-300' : isAtFreeDelivery ? 'border-green-300' : 'border-maroon/20'
+            className={`bg-white rounded-2xl p-4 sm:p-6 shadow-lg card-hover border-2 transition-all overflow-hidden relative ${
+                isBelowMin ? 'border-red-300' : isAtFreeDelivery ? 'border-green-400' : shouldPulse ? 'border-gold animate-pulse-border' : 'border-maroon/20'
             }`}
         >
+            {/* Savings callout - top right corner */}
+            <AnimatePresence>
+                {hasBulkDiscount && totalSavings > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0, rotate: -12 }}
+                        animate={{ opacity: 1, scale: 1, rotate: -3 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        className="absolute -top-1 -right-1 z-10"
+                    >
+                        <div className="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-bl-xl shadow-lg">
+                            <div className="flex items-center gap-1">
+                                <Tag size={10} />
+                                <span>বাঁচাচ্ছেন {formatPriceEn(totalSavings)}</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Badges row */}
             <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
                 {isAtFreeDelivery && (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full"
+                        className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"
                     >
-                        🎉 ফ্রি ডেলিভারি!
+                        <Truck size={10} />
+                        ফ্রি ডেলিভারি!
                     </motion.div>
                 )}
                 {hasBulkDiscount && (
@@ -83,7 +144,7 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                         className="bg-maroon text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"
                     >
                         <Percent size={10} />
-                        {discountPct}% ছাড় ({product.bulkPricing!.minQty}+ {product.unit})
+                        {discountPct}% ছাড়
                     </motion.div>
                 )}
             </div>
@@ -110,9 +171,7 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                 {hasBulkDiscount ? (
                     <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-2xl sm:text-3xl font-bold text-maroon">{formatPriceEn(unitPrice)}</span>
-                        {unitPrice < product.price && (
-                            <span className="text-base sm:text-lg text-dark-light line-through">{formatPriceEn(product.price)}</span>
-                        )}
+                        <span className="text-base sm:text-lg text-dark-light line-through">{formatPriceEn(product.price)}</span>
                         <span className="text-sm sm:text-base text-dark-light">/{product.unit}</span>
                     </div>
                 ) : (
@@ -121,7 +180,7 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                         <span className="text-sm sm:text-base text-dark-light">/{product.unit}</span>
                     </div>
                 )}
-                {hasBulkDiscount && product.bulkPricing && (
+                {product.bulkPricing && (
                     <p className="text-xs text-maroon font-medium mt-1">
                         {product.bulkPricing.minQty}+ {product.unit} অর্ডারে {formatPriceEn(product.bulkPricing.price)}/{product.unit}
                     </p>
@@ -133,11 +192,20 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                 সর্বনিম্ন অর্ডার: {product.minOrder} {product.unit}
             </p>
 
-            {/* Free delivery threshold */}
-            <div className="mb-4 sm:mb-6">
+            {/* Free delivery progress */}
+            <div className="mb-3 sm:mb-4">
                 <div className="flex justify-between text-xs text-dark-light mb-1">
-                    <span>ফ্রি ডেলিভারি</span>
-                    <span>{quantity}/{product.freeDeliveryThreshold}</span>
+                    <span className="flex items-center gap-1">
+                        <Truck size={10} />
+                        ফ্রি ডেলিভারি
+                    </span>
+                    <span className="font-medium">
+                        {isAtFreeDelivery ? (
+                            <span className="text-green-600">✅ অর্জিত!</span>
+                        ) : (
+                            <span>{quantity}/{product.freeDeliveryThreshold} {product.unit}</span>
+                        )}
+                    </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                     <motion.div
@@ -145,11 +213,50 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                             isAtFreeDelivery ? 'bg-green-500' : 'bg-maroon'
                         }`}
                         initial={{ width: 0 }}
-                        animate={{ width: `${Math.min((quantity / product.freeDeliveryThreshold) * 100, 100)}%` }}
+                        animate={{ width: `${deliveryProgress}%` }}
                         transition={{ duration: 0.3 }}
                     />
                 </div>
+                {!isAtFreeDelivery && deliveryRemaining > 0 && (
+                    <p className="text-xs text-maroon font-medium mt-1">
+                        আরো {deliveryRemaining} {product.unit} অর্ডার করুন → ফ্রি ডেলিভারি পান! 🎉
+                    </p>
+                )}
             </div>
+
+            {/* Bulk discount progress */}
+            {product.bulkPricing && (
+                <div className="mb-4 sm:mb-6">
+                    <div className="flex justify-between text-xs text-dark-light mb-1">
+                        <span className="flex items-center gap-1">
+                            <Percent size={10} />
+                            বাল্ক ছাড় ({discountPct || Math.round(((product.price - product.bulkPricing.price) / product.price) * 100)}%)
+                        </span>
+                        <span className="font-medium">
+                            {hasBulkDiscount ? (
+                                <span className="text-green-600">✅ ছাড় পাচ্ছেন!</span>
+                            ) : (
+                                <span>{quantity}/{product.bulkPricing.minQty} {product.unit}</span>
+                            )}
+                        </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                        <motion.div
+                            className={`h-2 rounded-full ${
+                                hasBulkDiscount ? 'bg-green-500' : 'bg-gold'
+                            }`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${bulkProgress}%` }}
+                            transition={{ duration: 0.3 }}
+                        />
+                    </div>
+                    {!hasBulkDiscount && bulkRemaining > 0 && (
+                        <p className="text-xs text-gold-dark font-medium mt-1">
+                            আরো {bulkRemaining} {product.unit} → {formatPriceEn(product.bulkPricing.price)}/{product.unit} পাবেন! 💰
+                        </p>
+                    )}
+                </div>
+            )}
 
             {/* Quantity selector with input */}
             <div className="flex items-center justify-center gap-2 sm:gap-3">

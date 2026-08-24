@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Truck, Gift, MessageCircle, AlertCircle, User, Phone, MapPin, CheckCircle } from 'lucide-react';
-import { Order, PRODUCTS, calculateTotal, getMinOrderWarning, formatPriceEn, getUnitPrice, getDiscountPercentage } from '@/lib/calculations';
+import { ShoppingCart, Truck, Gift, MessageCircle, AlertCircle, User, Phone, MapPin, CheckCircle, Tag } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { Order, PRODUCTS, calculateTotal, calculateTotalSavings, getMinOrderWarning, formatPriceEn, getUnitPrice, getDiscountPercentage } from '@/lib/calculations';
 import { getOrderWhatsAppLink, BKASH_NUMBER, CustomerInfo } from '@/lib/whatsapp';
 
 interface OrderSummaryProps {
@@ -15,6 +16,7 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
     const sectionRef = useRef<HTMLDivElement>(null);
     const cardRef = useRef<HTMLDivElement>(null);
     const { subtotal, delivery, total, isFreeDelivery } = calculateTotal(order);
+    const totalSavings = calculateTotalSavings(order);
     const warning = getMinOrderWarning(order);
     const hasItems = Object.values(order).some(qty => qty > 0);
     const advanceAmount = Math.round(total * 0.15);
@@ -26,10 +28,44 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
     });
     const [advancePaid, setAdvancePaid] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const prevFreeDelivery = useRef(isFreeDelivery);
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Confetti when entire order qualifies for free delivery
+    useEffect(() => {
+        if (isFreeDelivery && !prevFreeDelivery.current && hasItems) {
+            const end = Date.now() + 1000;
+            const colors = ['#4d191c', '#C9A227', '#25D366', '#E0B830'];
+
+            const frame = () => {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.7 },
+                    colors,
+                    disableForReducedMotion: true,
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.7 },
+                    colors,
+                    disableForReducedMotion: true,
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            };
+            frame();
+        }
+        prevFreeDelivery.current = isFreeDelivery;
+    }, [isFreeDelivery, hasItems]);
 
     useEffect(() => {
         if (!mounted || !sectionRef.current || !cardRef.current) return;
@@ -189,6 +225,26 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
                                     </p>
                                 </motion.div>
                             )}
+
+                            {/* Savings summary */}
+                            <AnimatePresence>
+                                {totalSavings > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="flex items-center justify-between py-2 sm:py-3 bg-green-50 px-3 rounded-lg mb-3"
+                                    >
+                                        <div className="flex items-center gap-2 text-green-700">
+                                            <Tag size={14} />
+                                            <span className="text-xs sm:text-sm font-medium">আপনি বাঁচাচ্ছেন</span>
+                                        </div>
+                                        <span className="text-green-700 font-bold text-sm sm:text-base">
+                                            {formatPriceEn(totalSavings)}
+                                        </span>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
                             {/* Total */}
                             <div className="flex justify-between items-center py-3 sm:py-4 border-t-2 border-maroon/30 mt-3 sm:mt-4">

@@ -165,6 +165,22 @@ body {
   animation: pulse-maroon 2s infinite;
 }
 
+/* Pulse border animation for urgency */
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.4);
+  }
+  50% {
+    border-color: var(--gold-light);
+    box-shadow: 0 0 0 4px rgba(201, 162, 39, 0);
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
 /* ============================================
    PREMIUM 3D & VISUAL EFFECTS
    ============================================ */

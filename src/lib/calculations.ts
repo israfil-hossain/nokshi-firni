@@ -22,7 +22,7 @@ export const PRODUCTS: Product[] = [
         nameEn: '100gm Firni',
         price: 40,
         bulkPricing: { minQty: 100, price: 35 },
-        minOrder: 10,
+        minOrder: 15,
         freeDeliveryThreshold: 50,
         unit: 'কাপ',
         image: '/100g_cup.jpeg',
@@ -141,6 +141,17 @@ export function getFreeDeliveryProgress(order: Order): {
         const percentage = Math.min((current / target) * 100, 100);
         return { product, current, target, percentage };
     }).filter(item => item.current > 0 && item.current < item.target);
+}
+
+export function calculateTotalSavings(order: Order): number {
+    return PRODUCTS.reduce((total, product) => {
+        const qty = order[product.id];
+        if (qty > 0 && product.bulkPricing && qty >= product.bulkPricing.minQty) {
+            const savingsPerUnit = product.price - product.bulkPricing.price;
+            return total + (qty * savingsPerUnit);
+        }
+        return total;
+    }, 0);
 }
 
 export function formatPrice(price: number): string {
