@@ -3,11 +3,11 @@ import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-    title: "নকশি - ঐতিহ্যবাহী ফিরনি",
+    title: "বিয়েবাড়ি - ঐতিহ্যবাহী ফিরনি",
     description: "ঐতিহ্যবাহী বাংলাদেশি ফিরনি, আপনার দোরগোড়ায় ডেলিভারি",
     icons: {
         icon: "/favicon.png",
-        apple: "/nokshi-logo.png",
+        apple: "/biyebari.png",
     },
 };
 

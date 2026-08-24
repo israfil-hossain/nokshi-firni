@@ -11,8 +11,8 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <img
-                            src="/nokshi-logo.png"
-                            alt="নকশি ফিরনি"
+                            src="/biyebari.png"
+                            alt="বিয়েবাড়ি"
                             className="h-12 sm:h-14 w-12 sm:w-14 rounded-full object-cover mb-3 sm:mb-4"
                         />
                         <p className="text-white/70 text-xs sm:text-sm">
@@ -41,11 +41,11 @@ export default function Footer() {
                                 +880 1723-560254
                             </a>
                             <a
-                                href="mailto:info@nokshi.com"
+                                href="mailto:info@biyebari.com"
                                 className="flex items-center gap-2 text-white/70 hover:text-gold transition-colors text-xs sm:text-sm"
                             >
                                 <Mail size={16} />
-                                info@nokshi.com
+                                info@biyebari.com
                             </a>
                         </div>
                     </div>
@@ -78,7 +78,7 @@ export default function Footer() {
 
                 {/* Bottom bar */}
                 <div className="border-t border-white/20 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-white/50 text-xs sm:text-sm">
-                    <p>&copy; {new Date().getFullYear()} নকশি ফিরনি। সর্বস্বত্ব সংরক্ষিত।</p>
+                            <p>&copy; {new Date().getFullYear()} বিয়েবাড়ি। সর্বস্বত্ব সংরক্ষিত।</p>
                 </div>
             </div>
         </footer>

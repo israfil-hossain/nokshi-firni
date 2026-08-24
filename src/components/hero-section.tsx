@@ -158,8 +158,8 @@ export default function HeroSection() {
               <div className="absolute inset-0 bg-gradient-to-r from-maroon/30 to-gold/30 rounded-full blur-3xl scale-75 group-hover:scale-90 transition-transform duration-500" />
               <div className="relative product-3d">
                 <Image
-                  src="/nokshi-firni.png"
-                  alt="নকশি ফিরনি"
+                  src="/biyebari.png"
+                  alt="বিয়েবাড়ি"
                   width={500}
                   height={500}
                   className="relative z-10 drop-shadow-2xl w-full h-auto mix-blend-multiply"

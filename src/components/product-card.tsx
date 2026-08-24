@@ -76,7 +76,7 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
             <div className="flex justify-center mb-4">
                 <div className="relative">
                     <Image
-                        src="/nokshi-firni.png"
+                        src="/biyebari.png"
                         alt={product.nameEn}
                         width={160}
                         height={160}

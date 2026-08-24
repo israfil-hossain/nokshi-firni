@@ -101,8 +101,8 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
                     <div className="flex justify-center mb-4 sm:mb-6">
                         <div className="relative">
                             <Image
-                                src="/nokshi-firni.png"
-                                alt="নকশি ফিরনি"
+                                src="/biyebari.png"
+                                alt="বিয়েবাড়ি"
                                 width={100}
                                 height={100}
                                 className="rounded-xl object-cover mix-blend-multiply"

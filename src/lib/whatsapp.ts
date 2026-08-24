@@ -14,7 +14,7 @@ export function generateOrderMessage(order: Order, customer: CustomerInfo): stri
     const advanceAmount = Math.round(total * 0.15);
 
     let message = 'Assalamu Alaikum! 🙏\n';
-    message += 'নকশি ফিরনি অর্ডার করতে চাই\n\n';
+    message += 'বিয়েবাড়ি অর্ডার করতে চাই\n\n';
 
     message += '👤 *গ্রাহকের তথ্য:*\n';
     message += '━━━━━━━━━━━━━━━━━━━\n';
@@ -61,7 +61,7 @@ export function generatePreOrderMessage(eventData: {
     notes: string;
 }): string {
     let message = 'Assalamu Alaikum! 🙏\n';
-    message += 'নকশি ফিরনি প্রি-অর্ডার\n\n';
+    message += 'বিয়েবাড়ি প্রি-অর্ডার\n\n';
     message += '🎉 *ইভেন্টের তথ্য:*\n';
     message += '━━━━━━━━━━━━━━━━━━━\n';
     message += `ইভেন্ট: ${eventData.eventName}\n`;
@@ -103,7 +103,7 @@ export function getMailtoLink(eventData: {
     quantity: string;
     notes: string;
 }): string {
-    const subject = encodeURIComponent('নকশি - ইভেন্ট প্রি-অর্ডার');
+    const subject = encodeURIComponent('বিয়েবাড়ি - ইভেন্ট প্রি-অর্ডার');
     const body = encodeURIComponent(`
 ইভেন্টের নাম: ${eventData.eventName}
 তারিখ: ${eventData.date}
@@ -111,7 +111,7 @@ export function getMailtoLink(eventData: {
 বিশেষ অনুরোধ: ${eventData.notes}
 
 --
-নকশি ফিরনি
+বিয়েবাড়ি
 WhatsApp: +${WHATSAPP_NUMBER}
     `);
     return `mailto:?subject=${subject}&body=${body}`;

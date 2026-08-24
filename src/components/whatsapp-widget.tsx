@@ -5,7 +5,7 @@ import { MessageCircle } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
 
 export default function WhatsAppWidget() {
-    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Assalamu Alaikum! 🙏\nনকশি ফিরনি সম্পর্কে জানতে চাই')}`;
+    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Assalamu Alaikum! 🙏\nবিয়েবাড়ি সম্পর্কে জানতে চাই')}`;
 
     return (
         <motion.div
