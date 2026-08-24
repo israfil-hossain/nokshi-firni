@@ -61,20 +61,30 @@ export function generatePreOrderMessage(eventData: {
     date: string;
     quantity: string;
     notes: string;
+    subtotal: number;
+    delivery: number;
+    total: number;
 }): string {
     let message = 'Assalamu Alaikum! 🙏\n';
     message += 'বিয়েবাড়ি প্রি-অর্ডার\n\n';
     message += '🎉 *ইভেন্টের তথ্য:*\n';
     message += '━━━━━━━━━━━━━━━━━━━\n';
     message += `ইভেন্ট: ${eventData.eventName}\n`;
-    message += `তারিখ: ${eventData.date}\n`;
-    message += `পরিমাণ: ${eventData.quantity}\n`;
+    message += `তারিখ: ${eventData.date}\n\n`;
+
+    message += '📦 *অর্ডারের বিবরণ:*\n';
+    message += '━━━━━━━━━━━━━━━━━━━\n';
+    message += `${eventData.quantity}\n`;
+    message += '━━━━━━━━━━━━━━━━━━━\n';
+    message += `সাবটোটাল: ${formatPriceEn(eventData.subtotal)}\n`;
+    message += `ডেলিভারি: ${eventData.delivery === 0 ? '*ফ্রি* 🎉' : formatPriceEn(eventData.delivery)}\n`;
+    message += '━━━━━━━━━━━━━━━━━━━\n';
+    message += `*মোট: ${formatPriceEn(eventData.total)}*\n\n`;
 
     if (eventData.notes) {
-        message += `বিশেষ অনুরোধ: ${eventData.notes}\n`;
+        message += `বিশেষ অনুরোধ: ${eventData.notes}\n\n`;
     }
 
-    message += '━━━━━━━━━━━━━━━━━━━\n\n';
     message += 'অনুগ্রহ করে এড্রেস ও কনফার্মেশন দিন।';
 
     return message;
@@ -94,6 +104,9 @@ export function getPreOrderWhatsAppLink(eventData: {
     date: string;
     quantity: string;
     notes: string;
+    subtotal: number;
+    delivery: number;
+    total: number;
 }): string {
     const message = generatePreOrderMessage(eventData);
     return getWhatsAppLink(message);
@@ -104,12 +117,22 @@ export function getMailtoLink(eventData: {
     date: string;
     quantity: string;
     notes: string;
+    subtotal: number;
+    delivery: number;
+    total: number;
 }): string {
     const subject = encodeURIComponent('বিয়েবাড়ি - ইভেন্ট প্রি-অর্ডার');
     const body = encodeURIComponent(`
 ইভেন্টের নাম: ${eventData.eventName}
 তারিখ: ${eventData.date}
-পরিমাণ: ${eventData.quantity}
+
+অর্ডার:
+${eventData.quantity}
+
+সাবটোটাল: ${formatPriceEn(eventData.subtotal)}
+ডেলিভারি: ${eventData.delivery === 0 ? 'ফ্রি' : formatPriceEn(eventData.delivery)}
+মোট: ${formatPriceEn(eventData.total)}
+
 বিশেষ অনুরোধ: ${eventData.notes}
 
 --

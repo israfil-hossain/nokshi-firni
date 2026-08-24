@@ -1,16 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Send, MessageCircle, Package, Check } from 'lucide-react';
+import { Send, MessageCircle, Package, Check, Truck } from 'lucide-react';
+import { PRODUCTS, getUnitPrice, DELIVERY_CHARGE, formatPriceEn } from '@/lib/calculations';
 import { getMailtoLink, getPreOrderWhatsAppLink } from '@/lib/whatsapp';
 
-const VARIANTS = [
-    { id: '150gm', name: '১৫০ গ্রাম', nameEn: '150gm Cup', price: 30, unit: 'কাপ' },
-    { id: '500gm', name: '৫০০ গ্রাম', nameEn: '500gm Box', price: 100, unit: 'বক্স' },
-    { id: '1kg', name: '১ কেজি', nameEn: '1kg Box', price: 200, unit: 'বক্স' },
-];
-
-const QUICK_AMOUNTS = [20, 50, 100, 200, 500];
+const QUICK_AMOUNTS = [5, 10, 20, 50, 100];
 
 export default function PreOrderForm() {
     const [formData, setFormData] = useState({
@@ -50,12 +45,30 @@ export default function PreOrderForm() {
         return parseInt(quantities[variantId]) || 0;
     };
 
-    const getTotal = (): number => {
+    const getSubtotal = (): number => {
         return selectedVariants.reduce((total, variantId) => {
-            const variant = VARIANTS.find(v => v.id === variantId);
+            const product = PRODUCTS.find(p => p.id === variantId);
             const qty = getVariantQuantity(variantId);
-            return total + (variant ? variant.price * qty : 0);
+            if (!product || qty === 0) return total;
+            const unitPrice = getUnitPrice(product, qty);
+            return total + (unitPrice * qty);
         }, 0);
+    };
+
+    const getDeliveryCharge = (): number => {
+        const hasItems = selectedVariants.some(id => getVariantQuantity(id) > 0);
+        if (!hasItems) return 0;
+
+        const allFreeDelivery = PRODUCTS.every(product => {
+            const qty = getVariantQuantity(product.id);
+            return qty === 0 || qty >= product.freeDeliveryThreshold;
+        });
+
+        return allFreeDelivery ? 0 : DELIVERY_CHARGE;
+    };
+
+    const getTotal = (): number => {
+        return getSubtotal() + getDeliveryCharge();
     };
 
     const isFormValid = formData.eventName && formData.date && selectedVariants.length > 0 &&
@@ -63,10 +76,12 @@ export default function PreOrderForm() {
 
     const buildQuantityString = (): string => {
         return selectedVariants.map(variantId => {
-            const variant = VARIANTS.find(v => v.id === variantId);
+            const product = PRODUCTS.find(p => p.id === variantId);
             const qty = getVariantQuantity(variantId);
-            return `${variant?.nameEn}: ${qty} ${variant?.unit}`;
-        }).join(', ');
+            const unitPrice = getUnitPrice(product!, qty);
+            const itemTotal = unitPrice * qty;
+            return `${product?.nameEn}: ${qty} ${product?.unit} × ${formatPriceEn(unitPrice)} = ${formatPriceEn(itemTotal)}`;
+        }).join('\n');
     };
 
     const handleEmailSubmit = () => {
@@ -74,6 +89,9 @@ export default function PreOrderForm() {
         const mailtoLink = getMailtoLink({
             ...formData,
             quantity: buildQuantityString(),
+            subtotal: getSubtotal(),
+            delivery: getDeliveryCharge(),
+            total: getTotal(),
         });
         window.location.href = mailtoLink;
     };
@@ -85,6 +103,9 @@ export default function PreOrderForm() {
             date: formData.date,
             quantity: buildQuantityString(),
             notes: formData.notes,
+            subtotal: getSubtotal(),
+            delivery: getDeliveryCharge(),
+            total: getTotal(),
         });
         window.open(whatsappLink, '_blank');
     };
@@ -141,13 +162,13 @@ export default function PreOrderForm() {
                                 ফিরনির সাইজ নির্বাচন করুন * (একাধিক বাছাই করতে পারেন)
                             </label>
                             <div className="grid grid-cols-3 gap-3">
-                                {VARIANTS.map((variant) => {
-                                    const isSelected = selectedVariants.includes(variant.id);
+                                {PRODUCTS.map((product) => {
+                                    const isSelected = selectedVariants.includes(product.id);
                                     return (
                                         <button
-                                            key={variant.id}
+                                            key={product.id}
                                             type="button"
-                                            onClick={() => toggleVariant(variant.id)}
+                                            onClick={() => toggleVariant(product.id)}
                                             className={`relative p-3 rounded-xl border-2 text-center transition-all ${
                                                 isSelected
                                                     ? 'border-maroon bg-maroon/5'
@@ -159,9 +180,14 @@ export default function PreOrderForm() {
                                                     <Check size={12} className="text-white" />
                                                 </div>
                                             )}
-                                            <p className="font-bold text-dark text-sm sm:text-base">{variant.name}</p>
-                                            <p className="text-xs text-dark-light">{variant.nameEn}</p>
-                                            <p className="text-maroon font-semibold text-sm mt-1">৳{variant.price}/{variant.unit}</p>
+                                            <p className="font-bold text-dark text-sm sm:text-base">{product.name}</p>
+                                            <p className="text-xs text-dark-light">{product.nameEn}</p>
+                                            <p className="text-maroon font-semibold text-sm mt-1">{formatPriceEn(product.price)}/{product.unit}</p>
+                                            {product.bulkTiers.length > 0 && (
+                                                <p className="text-[10px] text-gold-dark font-medium mt-0.5">
+                                                    {product.bulkTiers[0].minQty}+ → {formatPriceEn(product.bulkTiers[0].price)}
+                                                </p>
+                                            )}
                                         </button>
                                     );
                                 })}
@@ -173,16 +199,22 @@ export default function PreOrderForm() {
                             <div className="sm:col-span-2 space-y-4">
                                 <p className="text-xs text-dark-light">প্রতিটি সাইজের জন্য পরিমাণ দিন:</p>
                                 {selectedVariants.map(variantId => {
-                                    const variant = VARIANTS.find(v => v.id === variantId);
-                                    if (!variant) return null;
+                                    const product = PRODUCTS.find(p => p.id === variantId);
+                                    if (!product) return null;
+                                    const qty = getVariantQuantity(variantId);
+                                    const unitPrice = getUnitPrice(product, qty);
+                                    const hasDiscount = unitPrice < product.price;
                                     return (
                                         <div key={variantId} className="p-3 bg-gray-50 rounded-xl">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="text-sm font-medium text-dark">
-                                                    {variant.name} ({variant.nameEn})
+                                                    {product.name} ({product.nameEn})
                                                 </span>
-                                                <span className="text-xs text-dark-light">
-                                                    ৳{variant.price}/{variant.unit}
+                                                <span className={`text-xs font-semibold ${hasDiscount ? 'text-green-600' : 'text-dark-light'}`}>
+                                                    {formatPriceEn(unitPrice)}/{product.unit}
+                                                    {hasDiscount && (
+                                                        <span className="ml-1 line-through text-dark-light">{formatPriceEn(product.price)}</span>
+                                                    )}
                                                 </span>
                                             </div>
                                             <input
@@ -190,11 +222,11 @@ export default function PreOrderForm() {
                                                 value={quantities[variantId] || ''}
                                                 onChange={(e) => handleQuantityChange(variantId, e.target.value)}
                                                 min="1"
-                                                placeholder={`পরিমাণ (${variant.unit})`}
+                                                placeholder={`পরিমাণ (${product.unit})`}
                                                 className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-maroon focus:ring-2 focus:ring-maroon/20 outline-none transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                             />
                                             <div className="flex flex-wrap gap-1.5 mt-2">
-                                                {QUICK_AMOUNTS.filter(a => a >= variant.price ? true : true).slice(0, 4).map(amount => (
+                                                {QUICK_AMOUNTS.map(amount => (
                                                     <button
                                                         key={amount}
                                                         type="button"
@@ -209,9 +241,20 @@ export default function PreOrderForm() {
                                                     </button>
                                                 ))}
                                             </div>
-                                            {getVariantQuantity(variantId) > 0 && (
+                                            {qty > 0 && (
                                                 <p className="text-xs text-maroon font-medium mt-2">
-                                                    মোট: ৳{(variant.price * getVariantQuantity(variantId)).toLocaleString()}
+                                                    মোট: {formatPriceEn(unitPrice * qty)}
+                                                    {hasDiscount && (
+                                                        <span className="ml-1 text-green-600">
+                                                            (বাঁচাচ্ছেন {formatPriceEn((product.price - unitPrice) * qty)})
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            )}
+                                            {/* Free delivery progress */}
+                                            {qty > 0 && qty < product.freeDeliveryThreshold && (
+                                                <p className="text-[10px] text-maroon mt-1">
+                                                    আরো {product.freeDeliveryThreshold - qty} {product.unit} → ফ্রি ডেলিভারি 🎉
                                                 </p>
                                             )}
                                         </div>
@@ -236,11 +279,33 @@ export default function PreOrderForm() {
                         </div>
                     </div>
 
-                    {/* Grand Total */}
-                    {getTotal() > 0 && (
-                        <div className="mt-4 p-3 bg-maroon/5 rounded-xl flex justify-between items-center">
-                            <span className="text-sm text-dark-light">আনুমানিক মোট:</span>
-                            <span className="text-lg font-bold text-maroon">৳{getTotal().toLocaleString()}</span>
+                    {/* Price Summary */}
+                    {getSubtotal() > 0 && (
+                        <div className="mt-4 p-3 bg-gray-50 rounded-xl space-y-2">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-dark-light">সাবটোটাল:</span>
+                                <span className="font-medium text-dark">{formatPriceEn(getSubtotal())}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <div className="flex items-center gap-1 text-dark-light">
+                                    <Truck size={12} />
+                                    <span>ডেলিভারি:</span>
+                                </div>
+                                {getDeliveryCharge() === 0 ? (
+                                    <span className="font-medium text-green-600">ফ্রি! 🎉</span>
+                                ) : (
+                                    <span className="font-medium text-dark">{formatPriceEn(getDeliveryCharge())}</span>
+                                )}
+                            </div>
+                            <div className="border-t border-gray-200 pt-2 flex justify-between items-center">
+                                <span className="text-sm font-bold text-dark">মোট:</span>
+                                <span className="text-lg font-bold text-maroon">{formatPriceEn(getTotal())}</span>
+                            </div>
+                            {getDeliveryCharge() === 0 && (
+                                <p className="text-[10px] text-green-600 font-medium">
+                                    ✅ সব পণ্যের ফ্রি ডেলিভারি শর্ত পূরণ হয়েছে!
+                                </p>
+                            )}
                         </div>
                     )}
 
