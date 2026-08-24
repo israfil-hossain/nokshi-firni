@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nokshi.com/sitemap.xml
+Sitemap: https://www.biyebari.flowtim.com/sitemap.xml

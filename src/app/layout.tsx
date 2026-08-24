@@ -14,18 +14,18 @@ export const metadata: Metadata = {
     authors: [{ name: "নকশি ফিরনি" }],
     creator: "নকশি ফিরনি",
     publisher: "নকশি ফিরনি",
-    metadataBase: new URL("https://nokshi.com"),
+    metadataBase: new URL("https://www.biyebari.flowtim.com"),
     alternates: {
-        canonical: "https://nokshi.com",
+        canonical: "https://www.biyebari.flowtim.com",
     },
     openGraph: {
         title: "নকশি - ঐতিহ্যবাহী ফিরনি | অর্ডার করুন",
         description: "বাংলাদেশের ঐতিহ্যবাহী ফিরনি। ১৫০গ্রাম, ৫০০গ্রাম, ১কেজি। WhatsApp এ অর্ডার করুন।",
-        url: "https://nokshi.com",
+        url: "https://www.biyebari.flowtim.com",
         siteName: "নকশি ফিরনি",
         images: [
             {
-                url: "https://nokshi.com/og-image.svg",
+                url: "https://www.biyebari.flowtim.com/og-image.svg",
                 width: 1200,
                 height: 630,
                 alt: "নকশি ফিরনি - ঐতিহ্যবাহী বাংলাদেশি ফিরনি",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "নকশি - ঐতিহ্যবাহী ফিরনি",
         description: "বাংলাদেশের ঐতিহ্যবাহী ফিরনি। WhatsApp এ অর্ডার করুন।",
-        images: ["https://nokshi.com/og-image.svg"],
+        images: ["https://www.biyebari.flowtim.com/og-image.svg"],
     },
     robots: {
         index: true,
