@@ -1,4 +1,4 @@
-export interface BulkPricing {
+export interface BulkTier {
     minQty: number;
     price: number;
 }
@@ -8,7 +8,7 @@ export interface Product {
     name: string;
     nameEn: string;
     price: number;
-    bulkPricing?: BulkPricing;
+    bulkTiers: BulkTier[];
     minOrder: number;
     freeDeliveryThreshold: number;
     unit: string;
@@ -21,7 +21,10 @@ export const PRODUCTS: Product[] = [
         name: '১০০ গ্রাম ফিরনি',
         nameEn: '100gm Firni',
         price: 40,
-        bulkPricing: { minQty: 100, price: 35 },
+        bulkTiers: [
+            { minQty: 100, price: 30 },
+            { minQty: 50, price: 35 },
+        ],
         minOrder: 15,
         freeDeliveryThreshold: 50,
         unit: 'কাপ',
@@ -32,9 +35,12 @@ export const PRODUCTS: Product[] = [
         name: '৫০০ গ্রাম ফিরনি',
         nameEn: '500gm Firni',
         price: 200,
-        bulkPricing: { minQty: 10, price: 180 },
+        bulkTiers: [
+            { minQty: 20, price: 150 },
+            { minQty: 10, price: 175 },
+        ],
         minOrder: 5,
-        freeDeliveryThreshold: 10,
+        freeDeliveryThreshold: 5,
         unit: 'বক্স',
         image: '/500g_cup.jpeg',
     },
@@ -43,9 +49,12 @@ export const PRODUCTS: Product[] = [
         name: '১ কেজি ফিরনি',
         nameEn: '1kg Firni',
         price: 400,
-        bulkPricing: { minQty: 2, price: 380 },
+        bulkTiers: [
+            { minQty: 5, price: 320 },
+            { minQty: 3, price: 350 },
+        ],
         minOrder: 2,
-        freeDeliveryThreshold: 5,
+        freeDeliveryThreshold: 3,
         unit: 'বক্স',
         image: '/1kg_cup.jpeg',
     },
@@ -66,15 +75,37 @@ export const INITIAL_ORDER: Order = {
 };
 
 export function getUnitPrice(product: Product, quantity: number): number {
-    if (product.bulkPricing && quantity >= product.bulkPricing.minQty) {
-        return product.bulkPricing.price;
+    for (const tier of product.bulkTiers) {
+        if (quantity >= tier.minQty) {
+            return tier.price;
+        }
     }
     return product.price;
 }
 
+export function getActiveTier(product: Product, quantity: number): BulkTier | null {
+    for (const tier of product.bulkTiers) {
+        if (quantity >= tier.minQty) {
+            return tier;
+        }
+    }
+    return null;
+}
+
+export function getNextTier(product: Product, quantity: number): BulkTier | null {
+    // bulkTiers is sorted high to low, find first tier we haven't reached
+    for (let i = product.bulkTiers.length - 1; i >= 0; i--) {
+        if (quantity < product.bulkTiers[i].minQty) {
+            return product.bulkTiers[i];
+        }
+    }
+    return null;
+}
+
 export function getDiscountPercentage(product: Product, quantity: number): number | null {
-    if (product.bulkPricing && quantity >= product.bulkPricing.minQty) {
-        const savings = product.price - product.bulkPricing.price;
+    const tier = getActiveTier(product, quantity);
+    if (tier) {
+        const savings = product.price - tier.price;
         return Math.round((savings / product.price) * 100);
     }
     return null;
@@ -146,8 +177,9 @@ export function getFreeDeliveryProgress(order: Order): {
 export function calculateTotalSavings(order: Order): number {
     return PRODUCTS.reduce((total, product) => {
         const qty = order[product.id];
-        if (qty > 0 && product.bulkPricing && qty >= product.bulkPricing.minQty) {
-            const savingsPerUnit = product.price - product.bulkPricing.price;
+        const activeTier = getActiveTier(product, qty);
+        if (qty > 0 && activeTier) {
+            const savingsPerUnit = product.price - activeTier.price;
             return total + (qty * savingsPerUnit);
         }
         return total;

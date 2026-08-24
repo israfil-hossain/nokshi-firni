@@ -1,71 +1,111 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, Users, MessageSquare, Send, MessageCircle } from 'lucide-react';
+import { Calendar, Send, MessageCircle, Package, Check } from 'lucide-react';
 import { getMailtoLink, getPreOrderWhatsAppLink } from '@/lib/whatsapp';
+
+const VARIANTS = [
+    { id: '150gm', name: '১৫০ গ্রাম', nameEn: '150gm Cup', price: 30, unit: 'কাপ' },
+    { id: '500gm', name: '৫০০ গ্রাম', nameEn: '500gm Box', price: 100, unit: 'বক্স' },
+    { id: '1kg', name: '১ কেজি', nameEn: '1kg Box', price: 200, unit: 'বক্স' },
+];
+
+const QUICK_AMOUNTS = [20, 50, 100, 200, 500];
 
 export default function PreOrderForm() {
     const [formData, setFormData] = useState({
         eventName: '',
         date: '',
-        quantity: '',
         notes: '',
     });
+    const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
+    const [quantities, setQuantities] = useState<Record<string, string>>({});
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const toggleVariant = (variantId: string) => {
+        setSelectedVariants(prev => {
+            if (prev.includes(variantId)) {
+                const newVariants = prev.filter(id => id !== variantId);
+                const newQuantities = { ...quantities };
+                delete newQuantities[variantId];
+                setQuantities(newQuantities);
+                return newVariants;
+            }
+            return [...prev, variantId];
         });
     };
 
-    const isFormValid = formData.eventName && formData.date && formData.quantity;
+    const handleQuantityChange = (variantId: string, value: string) => {
+        setQuantities(prev => ({ ...prev, [variantId]: value }));
+    };
+
+    const handleQuickAmount = (variantId: string, amount: number) => {
+        setQuantities(prev => ({ ...prev, [variantId]: amount.toString() }));
+    };
+
+    const getVariantQuantity = (variantId: string): number => {
+        return parseInt(quantities[variantId]) || 0;
+    };
+
+    const getTotal = (): number => {
+        return selectedVariants.reduce((total, variantId) => {
+            const variant = VARIANTS.find(v => v.id === variantId);
+            const qty = getVariantQuantity(variantId);
+            return total + (variant ? variant.price * qty : 0);
+        }, 0);
+    };
+
+    const isFormValid = formData.eventName && formData.date && selectedVariants.length > 0 &&
+        selectedVariants.every(id => getVariantQuantity(id) > 0);
+
+    const buildQuantityString = (): string => {
+        return selectedVariants.map(variantId => {
+            const variant = VARIANTS.find(v => v.id === variantId);
+            const qty = getVariantQuantity(variantId);
+            return `${variant?.nameEn}: ${qty} ${variant?.unit}`;
+        }).join(', ');
+    };
 
     const handleEmailSubmit = () => {
         if (!isFormValid) return;
-        const mailtoLink = getMailtoLink(formData);
+        const mailtoLink = getMailtoLink({
+            ...formData,
+            quantity: buildQuantityString(),
+        });
         window.location.href = mailtoLink;
     };
 
     const handleWhatsAppSubmit = () => {
         if (!isFormValid) return;
-        const whatsappLink = getPreOrderWhatsAppLink(formData);
+        const whatsappLink = getPreOrderWhatsAppLink({
+            eventName: formData.eventName,
+            date: formData.date,
+            quantity: buildQuantityString(),
+            notes: formData.notes,
+        });
         window.open(whatsappLink, '_blank');
     };
 
     return (
         <section id="preorder" className="py-12 sm:py-16 lg:py-20 bg-cream">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Section header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-8 sm:mb-12"
-                >
+                <div className="text-center mb-8 sm:mb-12">
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-dark mb-3 sm:mb-4">
                         ইভেন্ট <span className="text-maroon">প্রি-অর্ডার</span>
                     </h2>
                     <p className="text-sm sm:text-base text-dark-light max-w-2xl mx-auto px-4">
                         বিয়ে, জন্মদিন, অন্যান্য অনুষ্ঠানের জন্য আগাম অর্ডার করুন
                     </p>
-                </motion.div>
+                </div>
 
-                {/* Form card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-maroon/20"
-                >
+                <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl border border-maroon/20">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         {/* Event Name */}
                         <div>
-                            <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-dark mb-2">
-                                <Calendar size={14} className="text-maroon" />
+                            <label className="block text-xs sm:text-sm font-medium text-dark mb-2">
                                 ইভেন্টের নাম *
                             </label>
                             <input
@@ -81,8 +121,7 @@ export default function PreOrderForm() {
 
                         {/* Date */}
                         <div>
-                            <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-dark mb-2">
-                                <Calendar size={14} className="text-maroon" />
+                            <label className="block text-xs sm:text-sm font-medium text-dark mb-2">
                                 তারিখ *
                             </label>
                             <input
@@ -95,53 +134,122 @@ export default function PreOrderForm() {
                             />
                         </div>
 
-                        {/* Quantity */}
-                        <div>
-                            <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-dark mb-2">
-                                <Users size={14} className="text-maroon" />
-                                পরিমাণ (মোট কার্ড/বক্স) *
+                        {/* Multi-select Variants */}
+                        <div className="sm:col-span-2">
+                            <label className="block text-xs sm:text-sm font-medium text-dark mb-2">
+                                <Package size={14} className="inline mr-1 text-maroon" />
+                                ফিরনির সাইজ নির্বাচন করুন * (একাধিক বাছাই করতে পারেন)
                             </label>
-                            <select
-                                name="quantity"
-                                value={formData.quantity}
-                                onChange={handleChange}
-                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:border-maroon focus:ring-2 focus:ring-maroon/20 outline-none transition-all text-sm sm:text-base"
-                                required
-                            >
-                                <option value="">নির্বাচন করুন</option>
-                                <option value="20-50">২০-৫০ কার্ড</option>
-                                <option value="50-100">৫০-১০০ কার্ড</option>
-                                <option value="100-200">১০০-২০০ কার্ড</option>
-                                <option value="200-500">২০০-৫০০ কার্ড</option>
-                                <option value="500+">৫০০+ কার্ড</option>
-                            </select>
+                            <div className="grid grid-cols-3 gap-3">
+                                {VARIANTS.map((variant) => {
+                                    const isSelected = selectedVariants.includes(variant.id);
+                                    return (
+                                        <button
+                                            key={variant.id}
+                                            type="button"
+                                            onClick={() => toggleVariant(variant.id)}
+                                            className={`relative p-3 rounded-xl border-2 text-center transition-all ${
+                                                isSelected
+                                                    ? 'border-maroon bg-maroon/5'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            {isSelected && (
+                                                <div className="absolute top-2 right-2 w-5 h-5 bg-maroon rounded-full flex items-center justify-center">
+                                                    <Check size={12} className="text-white" />
+                                                </div>
+                                            )}
+                                            <p className="font-bold text-dark text-sm sm:text-base">{variant.name}</p>
+                                            <p className="text-xs text-dark-light">{variant.nameEn}</p>
+                                            <p className="text-maroon font-semibold text-sm mt-1">৳{variant.price}/{variant.unit}</p>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
 
+                        {/* Quantity inputs for selected variants */}
+                        {selectedVariants.length > 0 && (
+                            <div className="sm:col-span-2 space-y-4">
+                                <p className="text-xs text-dark-light">প্রতিটি সাইজের জন্য পরিমাণ দিন:</p>
+                                {selectedVariants.map(variantId => {
+                                    const variant = VARIANTS.find(v => v.id === variantId);
+                                    if (!variant) return null;
+                                    return (
+                                        <div key={variantId} className="p-3 bg-gray-50 rounded-xl">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-sm font-medium text-dark">
+                                                    {variant.name} ({variant.nameEn})
+                                                </span>
+                                                <span className="text-xs text-dark-light">
+                                                    ৳{variant.price}/{variant.unit}
+                                                </span>
+                                            </div>
+                                            <input
+                                                type="number"
+                                                value={quantities[variantId] || ''}
+                                                onChange={(e) => handleQuantityChange(variantId, e.target.value)}
+                                                min="1"
+                                                placeholder={`পরিমাণ (${variant.unit})`}
+                                                className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-maroon focus:ring-2 focus:ring-maroon/20 outline-none transition-all text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            />
+                                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                                {QUICK_AMOUNTS.filter(a => a >= variant.price ? true : true).slice(0, 4).map(amount => (
+                                                    <button
+                                                        key={amount}
+                                                        type="button"
+                                                        onClick={() => handleQuickAmount(variantId, amount)}
+                                                        className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                                                            quantities[variantId] === amount.toString()
+                                                                ? 'bg-maroon text-white'
+                                                                : 'bg-white border border-gray-200 text-dark-light hover:bg-gray-100'
+                                                        }`}
+                                                    >
+                                                        {amount}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {getVariantQuantity(variantId) > 0 && (
+                                                <p className="text-xs text-maroon font-medium mt-2">
+                                                    মোট: ৳{(variant.price * getVariantQuantity(variantId)).toLocaleString()}
+                                                </p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
                         {/* Notes */}
-                        <div>
-                            <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-dark mb-2">
-                                <MessageSquare size={14} className="text-maroon" />
+                        <div className="sm:col-span-2">
+                            <label className="block text-xs sm:text-sm font-medium text-dark mb-2">
                                 বিশেষ অনুরোধ
                             </label>
-                            <input
-                                type="text"
+                            <textarea
                                 name="notes"
                                 value={formData.notes}
                                 onChange={handleChange}
-                                placeholder="যেমন: ফ্লেভার, প্যাকেজিং"
-                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:border-maroon focus:ring-2 focus:ring-maroon/20 outline-none transition-all text-sm sm:text-base"
+                                rows={2}
+                                placeholder="যেমন: ফ্লেভার, প্যাকেজিং, ডেলিভারি সময়"
+                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:border-maroon focus:ring-2 focus:ring-maroon/20 outline-none transition-all text-sm sm:text-base resize-none"
                             />
                         </div>
                     </div>
 
+                    {/* Grand Total */}
+                    {getTotal() > 0 && (
+                        <div className="mt-4 p-3 bg-maroon/5 rounded-xl flex justify-between items-center">
+                            <span className="text-sm text-dark-light">আনুমানিক মোট:</span>
+                            <span className="text-lg font-bold text-maroon">৳{getTotal().toLocaleString()}</span>
+                        </div>
+                    )}
+
                     {/* Submit buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8">
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                        <button
                             onClick={handleEmailSubmit}
                             disabled={!isFormValid}
-                            className={`flex-1 flex items-center justify-center gap-2 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all ${
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 sm:py-4 rounded-xl font-semibold text-base transition-colors ${
                                 isFormValid
                                     ? 'bg-maroon hover:bg-maroon-dark text-white'
                                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -149,14 +257,12 @@ export default function PreOrderForm() {
                         >
                             <Send size={18} />
                             ইমেইল পাঠান
-                        </motion.button>
+                        </button>
 
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                        <button
                             onClick={handleWhatsAppSubmit}
                             disabled={!isFormValid}
-                            className={`flex-1 flex items-center justify-center gap-2 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all ${
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 sm:py-4 rounded-xl font-semibold text-base transition-colors ${
                                 isFormValid
                                     ? 'bg-whatsapp text-white hover:bg-whatsapp-dark'
                                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -164,14 +270,13 @@ export default function PreOrderForm() {
                         >
                             <MessageCircle size={18} />
                             WhatsApp এ পাঠান
-                        </motion.button>
+                        </button>
                     </div>
 
-                    {/* Helper text */}
-                    <p className="text-center text-xs sm:text-sm text-dark-light mt-4 sm:mt-6">
+                    <p className="text-center text-xs text-dark-light mt-4">
                         আমরা ২৪ ঘণ্টার মধ্যে আপনার সাথে যোগাযোগ করব
                     </p>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minus, Plus, AlertCircle, Percent, Truck, Tag } from 'lucide-react';
+import { Minus, Plus, AlertCircle, Percent, Truck, Tag, Star } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { Product, formatPriceEn, getUnitPrice, getDiscountPercentage } from '@/lib/calculations';
+import { Product, formatPriceEn, getUnitPrice, getActiveTier, getNextTier, getDiscountPercentage } from '@/lib/calculations';
 
 interface ProductCardProps {
     product: Product;
@@ -16,22 +16,24 @@ interface ProductCardProps {
 export default function ProductCard({ product, quantity, onQuantityChange }: ProductCardProps) {
     const isBelowMin = quantity > 0 && quantity < product.minOrder;
     const isAtFreeDelivery = quantity >= product.freeDeliveryThreshold;
-    const hasBulkDiscount = product.bulkPricing && quantity >= product.bulkPricing.minQty;
+    const activeTier = getActiveTier(product, quantity);
+    const nextTier = getNextTier(product, quantity);
     const [inputValue, setInputValue] = useState(quantity.toString());
     const cardRef = useRef<HTMLDivElement>(null);
     const prevFreeDelivery = useRef(isAtFreeDelivery);
 
     const unitPrice = getUnitPrice(product, quantity);
     const discountPct = getDiscountPercentage(product, quantity);
-    const savingsPerUnit = product.bulkPricing ? product.price - product.bulkPricing.price : 0;
+    const hasBulkDiscount = activeTier !== null;
+    const savingsPerUnit = activeTier ? product.price - activeTier.price : 0;
     const totalSavings = hasBulkDiscount ? quantity * savingsPerUnit : 0;
 
-    // Progress toward bulk discount
-    const bulkProgress = product.bulkPricing
-        ? Math.min((quantity / product.bulkPricing.minQty) * 100, 100)
-        : 0;
-    const bulkRemaining = product.bulkPricing
-        ? Math.max(product.bulkPricing.minQty - quantity, 0)
+    // Progress toward next tier
+    const nextTierProgress = nextTier
+        ? Math.min((quantity / nextTier.minQty) * 100, 100)
+        : 100;
+    const nextTierRemaining = nextTier
+        ? Math.max(nextTier.minQty - quantity, 0)
         : 0;
 
     // Progress toward free delivery
@@ -58,8 +60,8 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
 
     // Pulsing border when close to threshold (>=80%)
     const isCloseToFreeDelivery = deliveryProgress >= 80 && deliveryProgress < 100;
-    const isCloseToBulk = product.bulkPricing && bulkProgress >= 80 && bulkProgress < 100;
-    const shouldPulse = isCloseToFreeDelivery || isCloseToBulk;
+    const isCloseToNextTier = nextTierProgress >= 80 && nextTierProgress < 100 && nextTier !== null;
+    const shouldPulse = isCloseToFreeDelivery || isCloseToNextTier;
 
     useEffect(() => {
         setInputValue(quantity.toString());
@@ -125,6 +127,20 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                 )}
             </AnimatePresence>
 
+            {/* Best Value badge for deepest discount */}
+            {activeTier && activeTier === product.bulkTiers[0] && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute top-3 left-3 z-10"
+                >
+                    <div className="bg-gold text-dark text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                        <Star size={8} fill="currentColor" />
+                        BEST VALUE
+                    </div>
+                </motion.div>
+            )}
+
             {/* Badges row */}
             <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
                 {isAtFreeDelivery && (
@@ -137,7 +153,7 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                         ফ্রি ডেলিভারি!
                     </motion.div>
                 )}
-                {hasBulkDiscount && (
+                {discountPct && (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -180,10 +196,19 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                         <span className="text-sm sm:text-base text-dark-light">/{product.unit}</span>
                     </div>
                 )}
-                {product.bulkPricing && (
-                    <p className="text-xs text-maroon font-medium mt-1">
-                        {product.bulkPricing.minQty}+ {product.unit} অর্ডারে {formatPriceEn(product.bulkPricing.price)}/{product.unit}
-                    </p>
+                {/* Show all tier prices */}
+                {product.bulkTiers.length > 0 && (
+                    <div className="mt-2 space-y-0.5">
+                        {product.bulkTiers.map((tier, idx) => {
+                            const isActive = quantity >= tier.minQty;
+                            const tierDiscount = Math.round(((product.price - tier.price) / product.price) * 100);
+                            return (
+                                <p key={idx} className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-maroon'}`}>
+                                    {isActive ? '✅' : '→'} {tier.minQty}+ {product.unit} = {formatPriceEn(tier.price)}/{product.unit} ({tierDiscount}% ছাড়)
+                                </p>
+                            );
+                        })}
+                    </div>
                 )}
             </div>
 
@@ -219,40 +244,34 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                 </div>
                 {!isAtFreeDelivery && deliveryRemaining > 0 && (
                     <p className="text-xs text-maroon font-medium mt-1">
-                        আরো {deliveryRemaining} {product.unit} অর্ডার করুন → ফ্রি ডেলিভারি পান! 🎉
+                        আরো {deliveryRemaining} {product.unit} → ফ্রি ডেলিভারি! 🎉
                     </p>
                 )}
             </div>
 
-            {/* Bulk discount progress */}
-            {product.bulkPricing && (
+            {/* Next tier progress */}
+            {nextTier && (
                 <div className="mb-4 sm:mb-6">
                     <div className="flex justify-between text-xs text-dark-light mb-1">
                         <span className="flex items-center gap-1">
                             <Percent size={10} />
-                            বাল্ক ছাড় ({discountPct || Math.round(((product.price - product.bulkPricing.price) / product.price) * 100)}%)
+                            পরবর্তী ছাড় ({formatPriceEn(nextTier.price)}/{product.unit})
                         </span>
                         <span className="font-medium">
-                            {hasBulkDiscount ? (
-                                <span className="text-green-600">✅ ছাড় পাচ্ছেন!</span>
-                            ) : (
-                                <span>{quantity}/{product.bulkPricing.minQty} {product.unit}</span>
-                            )}
+                            {quantity}/{nextTier.minQty} {product.unit}
                         </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                         <motion.div
-                            className={`h-2 rounded-full ${
-                                hasBulkDiscount ? 'bg-green-500' : 'bg-gold'
-                            }`}
+                            className="h-2 rounded-full bg-gold"
                             initial={{ width: 0 }}
-                            animate={{ width: `${bulkProgress}%` }}
+                            animate={{ width: `${nextTierProgress}%` }}
                             transition={{ duration: 0.3 }}
                         />
                     </div>
-                    {!hasBulkDiscount && bulkRemaining > 0 && (
+                    {nextTierRemaining > 0 && (
                         <p className="text-xs text-gold-dark font-medium mt-1">
-                            আরো {bulkRemaining} {product.unit} → {formatPriceEn(product.bulkPricing.price)}/{product.unit} পাবেন! 💰
+                            আরো {nextTierRemaining} {product.unit} → {formatPriceEn(nextTier.price)}/{product.unit} পাবেন! 💰
                         </p>
                     )}
                 </div>

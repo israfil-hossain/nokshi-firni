@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Truck, Gift, MessageCircle, AlertCircle, User, Phone, MapPin, CheckCircle, Tag } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { Order, PRODUCTS, calculateTotal, calculateTotalSavings, getMinOrderWarning, formatPriceEn, getUnitPrice, getDiscountPercentage } from '@/lib/calculations';
+import { Order, PRODUCTS, calculateTotal, calculateTotalSavings, getMinOrderWarning, formatPriceEn, getUnitPrice, getDiscountPercentage, getActiveTier } from '@/lib/calculations';
 import { getOrderWhatsAppLink, BKASH_NUMBER, CustomerInfo } from '@/lib/whatsapp';
 
 interface OrderSummaryProps {
@@ -221,7 +221,7 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
                                 >
                                     <p className="font-medium">ফ্রি ডেলিভারি পান!</p>
                                     <p className="text-xs mt-1">
-                                        ১০০গ্রা: ৫০+ কাপ | ৫০০গ্রা: ১০+ বক্স | ১কেজি: ৫+ বক্স
+                                        ১০০গ্রা: ৫০+ কাপ | ৫০০গ্রা: ৫+ বক্স | ১কেজি: ৩+ বক্স
                                     </p>
                                 </motion.div>
                             )}

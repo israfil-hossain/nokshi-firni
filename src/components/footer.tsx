@@ -11,9 +11,9 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <img
-                            src="/nokshi-logo.png"
+                            src="/biyebari.png"
                             alt="নকশি ফিরনি"
-                            className="h-14 w-auto object-contain mb-3 sm:mb-4"
+                            className="h-12 w-auto object-contain mb-3"
                         />
                         <p className="text-white/70 text-xs sm:text-sm">
                             ঐতিহ্যবাহী বাংলাদেশি ফিরনি। আমরা সেরা উপকরণ দিয়ে তৈরি করি আপনার প্রিয় ফিরনি।
