@@ -1,0 +1,285 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --maroon: #4d191c;
+    --maroon-dark: #3a1215;
+    --maroon-light: #6b2428;
+    --gold: #C9A227;
+    --gold-dark: #A68520;
+    --gold-light: #E0B830;
+    --cream: #FDF8F0;
+    --cream-dark: #F5EDE0;
+    --dark: #2D1810;
+    --dark-light: #5C4033;
+    --whatsapp: #25D366;
+    --whatsapp-dark: #128C7E;
+    --white: #FFFFFF;
+    --error: #DC2626;
+    --success: #16A34A;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  background-color: var(--cream);
+  color: var(--dark);
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--maroon);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--maroon-dark);
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(77, 25, 28, 0.3);
+  color: var(--dark);
+}
+
+/* WhatsApp ping animation */
+@keyframes whatsapp-ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.whatsapp-ping {
+  animation: whatsapp-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Button hover effects */
+.btn-maroon {
+  background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+  transition: all 0.3s ease;
+}
+
+.btn-maroon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(77, 25, 28, 0.3);
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Quantity button animation */
+.qty-btn {
+  transition: all 0.2s ease;
+}
+
+.qty-btn:active {
+  transform: scale(0.95);
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+/* Pulse animation */
+@keyframes pulse-maroon {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(77, 25, 28, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(77, 25, 28, 0);
+  }
+}
+
+.animate-pulse-maroon {
+  animation: pulse-maroon 2s infinite;
+}
+
+/* ============================================
+   PREMIUM 3D & VISUAL EFFECTS
+   ============================================ */
+
+/* 3D Product Image */
+.product-3d {
+  transform: perspective(1000px) rotateY(-8deg) rotateX(5deg);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.product-3d:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.05);
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Gold Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gold-dark) 0%,
+    var(--gold-light) 25%,
+    var(--gold) 50%,
+    var(--gold-light) 75%,
+    var(--gold-dark) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Floating Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Glow Effect */
+.glow-maroon {
+  box-shadow: 0 0 30px rgba(77, 25, 28, 0.4);
+}
+
+.glow-gold {
+  box-shadow: 0 0 30px rgba(201, 162, 39, 0.4);
+}
+
+/* Premium Gradient Background */
+.gradient-mesh {
+  background: 
+    radial-gradient(at 20% 20%, rgba(77, 25, 28, 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 10%, rgba(201, 162, 39, 0.1) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(77, 25, 28, 0.1) 0px, transparent 50%),
+    radial-gradient(at 90% 70%, rgba(201, 162, 39, 0.08) 0px, transparent 50%);
+}
+
+/* Noise Texture Overlay */
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/noise.webp');
+  background-repeat: repeat;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Leaf Shadow Effect */
+.leaf-shadow {
+  filter: drop-shadow(0 10px 20px rgba(45, 80, 22, 0.3));
+}
+
+/* Premium Border */
+.border-premium {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--cream), var(--cream)) padding-box,
+              linear-gradient(135deg, var(--maroon), var(--gold)) border-box;
+}
+
+/* Text Shadow for Premium Feel */
+.text-shadow {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth Scroll Behavior */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
+}
+
+/* Section Snap */
+.snap-section {
+  scroll-snap-align: start;
+}

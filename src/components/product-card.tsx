@@ -1,0 +1,163 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { Minus, Plus, AlertCircle } from 'lucide-react';
+import { Product, formatPriceEn } from '@/lib/calculations';
+
+interface ProductCardProps {
+    product: Product;
+    quantity: number;
+    onQuantityChange: (id: string, value: number) => void;
+}
+
+export default function ProductCard({ product, quantity, onQuantityChange }: ProductCardProps) {
+    const isBelowMin = quantity > 0 && quantity < product.minOrder;
+    const isAtFreeDelivery = quantity >= product.freeDeliveryThreshold;
+    const [inputValue, setInputValue] = useState(quantity.toString());
+
+    useEffect(() => {
+        setInputValue(quantity.toString());
+    }, [quantity]);
+
+    const handleDecrease = () => {
+        if (quantity > 0) {
+            onQuantityChange(product.id, quantity - 1);
+        }
+    };
+
+    const handleIncrease = () => {
+        onQuantityChange(product.id, quantity + 1);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        if (val === '') {
+            setInputValue('');
+            return;
+        }
+        const num = parseInt(val, 10);
+        if (!isNaN(num) && num >= 0) {
+            setInputValue(val);
+            onQuantityChange(product.id, num);
+        }
+    };
+
+    const handleInputBlur = () => {
+        if (inputValue === '' || parseInt(inputValue, 10) === 0) {
+            setInputValue('0');
+            onQuantityChange(product.id, 0);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={`bg-white rounded-2xl p-4 sm:p-6 shadow-lg card-hover border-2 transition-all overflow-hidden ${
+                isBelowMin ? 'border-red-300' : isAtFreeDelivery ? 'border-green-300' : 'border-maroon/20'
+            }`}
+        >
+            {/* Free delivery badge */}
+            {isAtFreeDelivery && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full inline-block mb-3 sm:mb-4"
+                >
+                    🎉 ফ্রি ডেলিভারি!
+                </motion.div>
+            )}
+
+            {/* Product image */}
+            <div className="flex justify-center mb-4">
+                <div className="relative">
+                    <Image
+                        src="/nokshi-firni.png"
+                        alt={product.nameEn}
+                        width={160}
+                        height={160}
+                        className="rounded-xl object-cover mix-blend-multiply drop-shadow-md"
+                    />
+                </div>
+            </div>
+
+            {/* Product name */}
+            <h3 className="text-lg sm:text-xl font-bold text-dark mb-1 sm:mb-2">{product.name}</h3>
+            <p className="text-xs sm:text-sm text-dark-light mb-3 sm:mb-4">{product.nameEn}</p>
+
+            {/* Price */}
+            <div className="mb-4 sm:mb-6">
+                <span className="text-2xl sm:text-3xl font-bold text-maroon">{formatPriceEn(product.price)}</span>
+                <span className="text-sm sm:text-base text-dark-light">/{product.unit}</span>
+            </div>
+
+            {/* Min order info */}
+            <p className="text-xs text-dark-light mb-3 sm:mb-4">
+                সর্বনিম্ন অর্ডার: {product.minOrder} {product.unit}
+            </p>
+
+            {/* Free delivery threshold */}
+            <div className="mb-4 sm:mb-6">
+                <div className="flex justify-between text-xs text-dark-light mb-1">
+                    <span>ফ্রি ডেলিভারি</span>
+                    <span>{quantity}/{product.freeDeliveryThreshold}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                    <motion.div
+                        className={`h-2 rounded-full ${
+                            isAtFreeDelivery ? 'bg-green-500' : 'bg-maroon'
+                        }`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.min((quantity / product.freeDeliveryThreshold) * 100, 100)}%` }}
+                        transition={{ duration: 0.3 }}
+                    />
+                </div>
+            </div>
+
+            {/* Quantity selector with input */}
+            <div className="flex items-center justify-center gap-2 sm:gap-3">
+                <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleDecrease}
+                    disabled={quantity === 0}
+                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-cream flex items-center justify-center text-dark hover:bg-maroon hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed qty-btn shrink-0"
+                >
+                    <Minus size={16} />
+                </motion.button>
+
+                <input
+                    type="number"
+                    min="0"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    className="w-16 sm:w-20 text-center text-lg sm:text-xl font-bold text-dark bg-cream border-2 border-maroon/20 rounded-lg py-2 focus:outline-none focus:border-maroon transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+
+                <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleIncrease}
+                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-maroon flex items-center justify-center text-white hover:bg-maroon-dark transition-colors qty-btn shrink-0"
+                >
+                    <Plus size={16} />
+                </motion.button>
+            </div>
+
+            {/* Warning message */}
+            {isBelowMin && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-3 sm:mt-4 flex items-center gap-2 text-red-500 text-xs sm:text-sm"
+                >
+                    <AlertCircle size={14} />
+                    <span>সর্বনিম্ন {product.minOrder} {product.unit} অর্ডার করুন</span>
+                </motion.div>
+            )}
+        </motion.div>
+    );
+}
