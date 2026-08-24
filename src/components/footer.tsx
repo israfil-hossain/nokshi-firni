@@ -1,7 +1,7 @@
 'use client';
 
 import { MessageCircle, Phone, Mail } from 'lucide-react';
-import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
+import { WHATSAPP_NUMBER, EMAIL } from '@/lib/whatsapp';
 
 export default function Footer() {
     return (
@@ -41,11 +41,11 @@ export default function Footer() {
                                 +880 1723-560254
                             </a>
                             <a
-                                href="mailto:info@biyebari.com"
+                                href={`mailto:${EMAIL}`}
                                 className="flex items-center gap-2 text-white/70 hover:text-gold transition-colors text-xs sm:text-sm"
                             >
                                 <Mail size={16} />
-                                info@biyebari.com
+                                {EMAIL}
                             </a>
                         </div>
                     </div>

@@ -2,6 +2,7 @@ import { Order, PRODUCTS, calculateTotal, formatPriceEn } from './calculations';
 
 export const WHATSAPP_NUMBER = '8801723560254';
 export const BKASH_NUMBER = '01843566251';
+export const EMAIL = 'biyebarimistanno@gmail.com';
 
 export interface CustomerInfo {
     name: string;
@@ -114,5 +115,5 @@ export function getMailtoLink(eventData: {
 বিয়েবাড়ি
 WhatsApp: +${WHATSAPP_NUMBER}
     `);
-    return `mailto:?subject=${subject}&body=${body}`;
+    return `mailto:${EMAIL}?subject=${subject}&body=${body}`;
 }
