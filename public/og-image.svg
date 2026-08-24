@@ -1,0 +1,44 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FDF8F0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5EDE0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4d191c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6b2428;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Decorative circle -->
+  <circle cx="900" cy="315" r="250" fill="#4d191c" opacity="0.05"/>
+  <circle cx="900" cy="315" r="180" fill="#4d191c" opacity="0.08"/>
+  
+  <!-- Left accent bar -->
+  <rect x="80" y="180" width="8" height="120" fill="url(#accent)" rx="4"/>
+  
+  <!-- Brand name -->
+  <text x="120" y="230" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#4d191c">নকশি</text>
+  
+  <!-- Product name -->
+  <text x="120" y="310" font-family="Arial, sans-serif" font-size="56" fill="#2D1810">ফিরনি</text>
+  
+  <!-- Tagline -->
+  <text x="120" y="380" font-family="Arial, sans-serif" font-size="28" fill="#5C4033">ঐতিহ্যবাহী বাংলাদেশি ফিরনি</text>
+  
+  <!-- Subtitle -->
+  <text x="120" y="430" font-family="Arial, sans-serif" font-size="22" fill="#5C4033">WhatsApp এ অর্ডার করুন | ফ্রি ডেলিভারি</text>
+  
+  <!-- Price badge -->
+  <rect x="120" y="480" width="200" height="50" fill="url(#accent)" rx="25"/>
+  <text x="220" y="512" font-family="Arial, sans-serif" font-size="22" fill="white" text-anchor="middle">৳৩০ থেকে শুরু</text>
+  
+  <!-- Contact info -->
+  <text x="120" y="570" font-family="Arial, sans-serif" font-size="18" fill="#5C4033">📞 +880 1723-560254</text>
+  
+  <!-- Website -->
+  <text x="1100" y="590" font-family="Arial, sans-serif" font-size="16" fill="#5C4033" text-anchor="end">nokshi.com</text>
+</svg>

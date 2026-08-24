@@ -1,0 +1,24 @@
+{
+    "name": "নকশি ফিরনি",
+    "short_name": "নকশি",
+    "description": "ঐতিহ্যবাহী বাংলাদেশি ফিরনি অর্ডার করুন",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FDF8F0",
+    "theme_color": "#4d191c",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/biyebari.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/biyebari.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "lang": "bn",
+    "dir": "ltr"
+}

@@ -21,7 +21,7 @@ export default function Home() {
     }, []);
 
     return (
-        <main className="min-h-screen">
+        <main className="min-h-screen" itemScope itemType="https://schema.org/WebPage">
             <Navbar />
             <HeroSection />
             <ProductsSection order={order} onQuantityChange={handleQuantityChange} />

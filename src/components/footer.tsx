@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { MessageCircle, Phone, Mail } from 'lucide-react';
 import { WHATSAPP_NUMBER, EMAIL } from '@/lib/whatsapp';
 
@@ -10,10 +11,12 @@ export default function Footer() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
                     {/* Brand */}
                     <div>
-                        <img
+                        <Image
                             src="/biyebari.png"
-                            alt="নকশি ফিরনি"
-                            className="h-12 w-auto object-contain mb-3"
+                            alt="নকশি ফিরনি - ঐতিহ্যবাহী বাংলাদেশি ফিরনি"
+                            width={56}
+                            height={56}
+                            className="mb-3"
                         />
                         <p className="text-white/70 text-xs sm:text-sm">
                             ঐতিহ্যবাহী বাংলাদেশি ফিরনি। আমরা সেরা উপকরণ দিয়ে তৈরি করি আপনার প্রিয় ফিরনি।
@@ -78,7 +81,7 @@ export default function Footer() {
 
                 {/* Bottom bar */}
                 <div className="border-t border-white/20 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-white/50 text-xs sm:text-sm">
-                            <p>&copy; {new Date().getFullYear()} বিয়েবাড়ি। সর্বস্বত্ব সংরক্ষিত।</p>
+                    <p>&copy; {new Date().getFullYear()} নকশি ফিরনি। সর্বস্বত্ব সংরক্ষিত।</p>
                 </div>
             </div>
         </footer>
