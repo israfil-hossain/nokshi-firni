@@ -2,12 +2,12 @@ export default function StructuredData() {
     const organizationSchema = {
         '@context': 'https://schema.org',
         '@type': 'FoodEstablishment',
-        name: 'নকশি ফিরনি',
-        alternateName: 'Nokshi Firni',
+        name: 'বিয়েবাড়ি ফিরনি',
+        alternateName: 'Biyebari Firni',
         description: 'ঐতিহ্যবাহী বাংলাদেশি ফিরনি। প্রিমিয়াম চাল, খাঁটি দুধ ও প্রাকৃতিক উপকরণ দিয়ে তৈরি।',
         url: 'https://www.biyebari.flowtim.com',
         telephone: '+8801723560254',
-        priceRange: '৳৩০-৳২০০',
+        priceRange: '৳৪০-৳৪০০',
         servesCuisine: 'Bangladeshi',
         image: 'https://www.biyebari.flowtim.com/nokshi-firni.png',
         logo: 'https://www.biyebari.flowtim.com/biyebari.png',
@@ -29,17 +29,17 @@ export default function StructuredData() {
         {
             '@context': 'https://schema.org',
             '@type': 'Product',
-            name: '১৫০ গ্রাম ফিরনি',
-            alternateName: '150gm Firni Cup',
-            description: 'ঐতিহ্যবাহী ১৫০ গ্রাম ফিরনি - এক কাপ। প্রিমিয়াম চাল ও খাঁটি দুধ দিয়ে তৈরি।',
+            name: '১০০ গ্রাম ফিরনি',
+            alternateName: '100gm Firni Cup',
+            description: 'ঐতিহ্যবাহী ১০০ গ্রাম ফিরনি - এক কাপ। প্রিমিয়াম চাল ও খাঁটি দুধ দিয়ে তৈরি।',
             image: 'https://www.biyebari.flowtim.com/nokshi-firni.png',
             brand: {
                 '@type': 'Brand',
-                name: 'নকশি',
+                name: 'বিয়েবাড়ি',
             },
             offers: {
                 '@type': 'Offer',
-                price: '30',
+                price: '40',
                 priceCurrency: 'BDT',
                 availability: 'https://schema.org/InStock',
                 itemCondition: 'https://schema.org/NewCondition',
@@ -59,11 +59,11 @@ export default function StructuredData() {
             image: 'https://www.biyebari.flowtim.com/nokshi-firni.png',
             brand: {
                 '@type': 'Brand',
-                name: 'নকশি',
+                name: 'বিয়েবাড়ি',
             },
             offers: {
                 '@type': 'Offer',
-                price: '100',
+                price: '200',
                 priceCurrency: 'BDT',
                 availability: 'https://schema.org/InStock',
                 itemCondition: 'https://schema.org/NewCondition',
@@ -83,7 +83,7 @@ export default function StructuredData() {
             image: 'https://www.biyebari.flowtim.com/nokshi-firni.png',
             brand: {
                 '@type': 'Brand',
-                name: 'নকশি',
+                name: 'বিয়েবাড়ি',
             },
             offers: {
                 '@type': 'Offer',
@@ -103,7 +103,7 @@ export default function StructuredData() {
     const websiteSchema = {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: 'নকশি ফিরনি',
+        name: 'বিয়েবাড়ি ফিরনি',
         url: 'https://www.biyebari.flowtim.com',
         description: 'ঐতিহ্যবাহী বাংলাদেশি ফিরনি অর্ডার করুন',
         inLanguage: 'bn',

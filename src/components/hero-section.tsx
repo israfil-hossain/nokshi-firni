@@ -99,7 +99,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section ref={sectionRef} id="hero" className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-24 pb-12" aria-label="নকশি ফিরনি হিরো সেকশন">
+    <section ref={sectionRef} id="hero" className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden pt-24 pb-12" aria-label="বিয়েবাড়ি ফিরনি হিরো সেকশন">
       {/* Gradient mesh background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-maroon/5 via-transparent to-gold/5" />
@@ -159,7 +159,7 @@ export default function HeroSection() {
               <div className="relative product-3d">
                 <Image
                   src="/biyebari.png"
-                  alt="নকশি ঐতিহ্যবাহী ফিরনি - বাংলাদেশি মিষ্টি প্রিমিয়াম কোয়ালিটি"
+                  alt="বিয়েবাড়ি ঐতিহ্যবাহী ফিরনি - বাংলাদেশি মিষ্টি প্রিমিয়াম কোয়ালিটি"
                   width={500}
                   height={500}
                   className="relative z-10 drop-shadow-2xl w-full h-auto mix-blend-multiply"

@@ -6,29 +6,29 @@ import "@/styles/globals.css";
 
 export const metadata: Metadata = {
     title: {
-        default: "নকশি - ঐতিহ্যবাহী ফিরনি | অর্ডার করুন WhatsApp এ",
-        template: "%s | নকশি ফিরনি",
+        default: "বিয়েবাড়ি - ঐতিহ্যবাহী ফিরনি | অর্ডার করুন WhatsApp এ",
+        template: "%s | বিয়েবাড়ি ফিরনি",
     },
-    description: "বাংলাদেশের ঐতিহ্যবাহী ফিরনি। ১৫০গ্রাম, ৫০০গ্রাম, ১কেজি। WhatsApp এ অর্ডার করুন। ফ্রি ডেলিভারি পান।",
-    keywords: ["ফিরনি", "বাংলাদেশি ফিরনি", "ঐতিহ্যবাহী ফিরনি", "ফিরনি অর্ডার", "ফিরনি ডেলিভারি", "নকশি ফিরনি", "firni", "bangladeshi firni"],
-    authors: [{ name: "নকশি ফিরনি" }],
-    creator: "নকশি ফিরনি",
-    publisher: "নকশি ফিরনি",
+    description: "বাংলাদেশের ঐতিহ্যবাহী ফিরনি। ১০০গ্রাম, ৫০০গ্রাম, ১কেজি। WhatsApp এ অর্ডার করুন। ফ্রি ডেলিভারি পান।",
+    keywords: ["ফিরনি", "বাংলাদেশি ফিরনি", "ঐতিহ্যবাহী ফিরনি", "ফিরনি অর্ডার", "ফিরনি ডেলিভারি", "বিয়েবাড়ি ফিরনি", "firni", "bangladeshi firni"],
+    authors: [{ name: "বিয়েবাড়ি ফিরনি" }],
+    creator: "বিয়েবাড়ি ফিরনি",
+    publisher: "বিয়েবাড়ি ফিরনি",
     metadataBase: new URL("https://www.biyebari.flowtim.com"),
     alternates: {
         canonical: "https://www.biyebari.flowtim.com",
     },
     openGraph: {
-        title: "নকশি - ঐতিহ্যবাহী ফিরনি | অর্ডার করুন",
-        description: "বাংলাদেশের ঐতিহ্যবাহী ফিরনি। ১৫০গ্রাম, ৫০০গ্রাম, ১কেজি। WhatsApp এ অর্ডার করুন।",
+        title: "বিয়েবাড়ি - ঐতিহ্যবাহী ফিরনি | অর্ডার করুন",
+        description: "বাংলাদেশের ঐতিহ্যবাহী ফিরনি। ১০০গ্রাম, ৫০০গ্রাম, ১কেজি। WhatsApp এ অর্ডার করুন।",
         url: "https://www.biyebari.flowtim.com",
-        siteName: "নকশি ফিরনি",
+        siteName: "বিয়েবাড়ি ফিরনি",
         images: [
             {
                 url: "https://www.biyebari.flowtim.com/og-image.svg",
                 width: 1200,
                 height: 630,
-                alt: "নকশি ফিরনি - ঐতিহ্যবাহী বাংলাদেশি ফিরনি",
+                alt: "বিয়েবাড়ি ফিরনি - ঐতিহ্যবাহী বাংলাদেশি ফিরনি",
             },
         ],
         locale: "bn_BD",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "নকশি - ঐতিহ্যবাহী ফিরনি",
+        title: "বিয়েবাড়ি - ঐতিহ্যবাহী ফিরনি",
         description: "বাংলাদেশের ঐতিহ্যবাহী ফিরনি। WhatsApp এ অর্ডার করুন।",
         images: ["https://www.biyebari.flowtim.com/og-image.svg"],
     },

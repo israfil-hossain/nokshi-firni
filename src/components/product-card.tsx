@@ -170,7 +170,7 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
                 <div className="relative">
                     <Image
                         src={product.image}
-                        alt={`${product.name} - ${product.nameEn} - নকশি ফিরনি অর্ডার করুন`}
+                        alt={`${product.name} - ${product.nameEn} - বিয়েবাড়ি ফিরনি অর্ডার করুন`}
                         width={160}
                         height={160}
                         className="rounded-xl object-cover mix-blend-multiply drop-shadow-md"

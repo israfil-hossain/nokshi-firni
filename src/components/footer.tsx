@@ -13,7 +13,7 @@ export default function Footer() {
                     <div>
                         <Image
                             src="/biyebari.png"
-                            alt="নকশি ফিরনি - ঐতিহ্যবাহী বাংলাদেশি ফিরনি"
+                            alt="বিয়েবাড়ি ফিরনি - ঐতিহ্যবাহী বাংলাদেশি ফিরনি"
                             width={56}
                             height={56}
                             className="mb-3"
@@ -81,7 +81,7 @@ export default function Footer() {
 
                 {/* Bottom bar */}
                 <div className="border-t border-white/20 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-white/50 text-xs sm:text-sm">
-                    <p>&copy; {new Date().getFullYear()} নকশি ফিরনি। সর্বস্বত্ব সংরক্ষিত।</p>
+                    <p>&copy; {new Date().getFullYear()} বিয়েবাড়ি। সর্বস্বত্ব সংরক্ষিত।</p>
                 </div>
             </div>
         </footer>
