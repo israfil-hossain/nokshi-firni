@@ -1,8 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { MessageCircle, Phone, Mail } from 'lucide-react';
+import { MessageCircle, Phone, Mail, Facebook, Instagram } from 'lucide-react';
 import { WHATSAPP_NUMBER, EMAIL } from '@/lib/whatsapp';
+
+const FACEBOOK_URL = 'https://www.facebook.com/biyebarimistanno/';
+const INSTAGRAM_URL = 'https://www.instagram.com/biyabarimistanno/?hl=en';
 
 export default function Footer() {
     return (
@@ -18,9 +21,30 @@ export default function Footer() {
                             height={56}
                             className="mb-3"
                         />
-                        <p className="text-white/70 text-xs sm:text-sm">
+                        <p className="text-white/70 text-xs sm:text-sm mb-4">
                             ঐতিহ্যবাহী বাংলাদেশি ফিরনি। আমরা সেরা উপকরণ দিয়ে তৈরি করি আপনার প্রিয় ফিরনি।
                         </p>
+                        {/* Social links */}
+                        <div className="flex gap-3">
+                            <a
+                                href={FACEBOOK_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
+                                aria-label="Facebook"
+                            >
+                                <Facebook size={18} />
+                            </a>
+                            <a
+                                href={INSTAGRAM_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors"
+                                aria-label="Instagram"
+                            >
+                                <Instagram size={18} />
+                            </a>
+                        </div>
                     </div>
 
                     {/* Contact */}
@@ -38,14 +62,14 @@ export default function Footer() {
                             </a>
                             <a
                                 href={`tel:+${WHATSAPP_NUMBER}`}
-                                className="flex items-center gap-2 text-white/70 hover:text-gold transition-colors text-xs sm:text-sm"
+                                className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-xs sm:text-sm"
                             >
                                 <Phone size={16} />
                                 +880 1723-560254
                             </a>
                             <a
                                 href={`mailto:${EMAIL}`}
-                                className="flex items-center gap-2 text-white/70 hover:text-gold transition-colors text-xs sm:text-sm"
+                                className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-xs sm:text-sm"
                             >
                                 <Mail size={16} />
                                 {EMAIL}
@@ -59,19 +83,19 @@ export default function Footer() {
                         <div className="space-y-2">
                             <button
                                 onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="block text-white/70 hover:text-gold transition-colors text-xs sm:text-sm"
+                                className="block text-white/70 hover:text-white transition-colors text-xs sm:text-sm"
                             >
                                 আমাদের পণ্য
                             </button>
                             <button
                                 onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="block text-white/70 hover:text-gold transition-colors text-xs sm:text-sm"
+                                className="block text-white/70 hover:text-white transition-colors text-xs sm:text-sm"
                             >
                                 অর্ডার করুন
                             </button>
                             <button
                                 onClick={() => document.getElementById('preorder')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="block text-white/70 hover:text-gold transition-colors text-xs sm:text-sm"
+                                className="block text-white/70 hover:text-white transition-colors text-xs sm:text-sm"
                             >
                                 প্রি-অর্ডার
                             </button>
@@ -80,8 +104,12 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="border-t border-white/20 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-white/50 text-xs sm:text-sm">
+                <div className="border-t border-white/20 mt-6 sm:mt-8 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-white/50 text-xs sm:text-sm">
                     <p>&copy; {new Date().getFullYear()} বিয়েবাড়ি। সর্বস্বত্ব সংরক্ষিত।</p>
+                    <div className="flex gap-4">
+                        <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Facebook</a>
+                        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Toaster } from "@/components/ui/sonner";
+import { PageViewTracker } from "@/components/page-view-tracker";
 import StructuredData from "@/components/seo/structured-data";
 import "@/styles/globals.css";
 
@@ -106,6 +107,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                     />
                 </noscript>
                 <Toaster richColors position="top-right" />
+                <PageViewTracker />
                 {children}
             </body>
         </html>
