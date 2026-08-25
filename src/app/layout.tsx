@@ -74,28 +74,6 @@ export default function RootLayout({
         <html lang="bn">
             <head>
                 <StructuredData />
-                <Script
-                    id="gtm-script"
-                    strategy="afterInteractive"
-                >
-                    {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-W3LBBK9P');`}
-                </Script>
-                <Script
-                    src="https://www.googletagmanager.com/gtag/js?id=G-G0S8BJ2SL0"
-                    strategy="afterInteractive"
-                />
-                <Script id="google-analytics" strategy="afterInteractive">
-                    {`
-                        window.dataLayer = window.dataLayer || [];
-                        function gtag(){dataLayer.push(arguments);}
-                        gtag('js', new Date());
-                        gtag('config', 'G-G0S8BJ2SL0');
-                    `}
-                </Script>
             </head>
             <body className="min-h-screen bg-cream text-dark antialiased font-bangla">
                 <noscript>
@@ -106,6 +84,28 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                         style={{ display: 'none', visibility: 'hidden' }}
                     />
                 </noscript>
+
+                {/* Google Tag Manager */}
+                <Script id="gtm-init" strategy="afterInteractive">
+                    {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-W3LBBK9P');`}
+                </Script>
+
+                {/* Google Analytics (GA4) */}
+                <Script
+                    src="https://www.googletagmanager.com/gtag/js?id=G-G0S8BJ2SL0"
+                    strategy="afterInteractive"
+                />
+                <Script id="ga4-config" strategy="afterInteractive">
+                    {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-G0S8BJ2SL0', { send_page_view: false });`}
+                </Script>
+
                 <Toaster richColors position="top-right" />
                 <PageViewTracker />
                 {children}
