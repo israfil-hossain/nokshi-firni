@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Send, MessageCircle, Package, Check, Truck } from 'lucide-react';
 import { PRODUCTS, getUnitPrice, DELIVERY_CHARGE, formatPriceEn } from '@/lib/calculations';
 import { getMailtoLink, getPreOrderWhatsAppLink } from '@/lib/whatsapp';
+import { pushToDataLayer } from '@/lib/gtm';
 
 const QUICK_AMOUNTS = [5, 10, 20, 50, 100];
 
@@ -86,6 +87,12 @@ export default function PreOrderForm() {
 
     const handleEmailSubmit = () => {
         if (!isFormValid) return;
+        pushToDataLayer({
+            event: 'generate_lead',
+            form_name: 'preorder_email',
+            value: getTotal(),
+            currency: 'BDT',
+        });
         const mailtoLink = getMailtoLink({
             ...formData,
             quantity: buildQuantityString(),
@@ -98,6 +105,12 @@ export default function PreOrderForm() {
 
     const handleWhatsAppSubmit = () => {
         if (!isFormValid) return;
+        pushToDataLayer({
+            event: 'generate_lead',
+            form_name: 'preorder_whatsapp',
+            value: getTotal(),
+            currency: 'BDT',
+        });
         const whatsappLink = getPreOrderWhatsAppLink({
             eventName: formData.eventName,
             date: formData.date,
