@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Minus, Plus, AlertCircle, Percent, Truck, Tag, Star } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Product, formatPriceEn, getUnitPrice, getActiveTier, getNextTier, getDiscountPercentage } from '@/lib/calculations';
+import { pushToDataLayer } from '@/lib/gtm';
 
 interface ProductCardProps {
     product: Product;
@@ -70,11 +71,27 @@ export default function ProductCard({ product, quantity, onQuantityChange }: Pro
     const handleDecrease = () => {
         if (quantity > 0) {
             onQuantityChange(product.id, quantity - 1);
+            pushToDataLayer({
+                event: 'remove_from_cart',
+                item_id: product.id,
+                item_name: product.nameEn,
+                price: getUnitPrice(product, quantity - 1),
+                quantity: 1,
+                currency: 'BDT',
+            });
         }
     };
 
     const handleIncrease = () => {
         onQuantityChange(product.id, quantity + 1);
+        pushToDataLayer({
+            event: 'add_to_cart',
+            item_id: product.id,
+            item_name: product.nameEn,
+            price: getUnitPrice(product, quantity + 1),
+            quantity: 1,
+            currency: 'BDT',
+        });
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

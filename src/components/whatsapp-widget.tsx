@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
+import { pushToDataLayer } from '@/lib/gtm';
 
 export default function WhatsAppWidget() {
     const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Assalamu Alaikum! 🙏\nবিয়েবাড়ি সম্পর্কে জানতে চাই')}`;
@@ -24,6 +25,12 @@ export default function WhatsAppWidget() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                onClick={() => {
+                    pushToDataLayer({
+                        event: 'contact',
+                        method: 'whatsapp',
+                    });
+                }}
                 className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-whatsapp rounded-full shadow-lg hover:bg-whatsapp-dark transition-colors group"
             >
                 <MessageCircle size={24} className="text-white sm:w-7 sm:h-7" />

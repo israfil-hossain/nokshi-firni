@@ -7,6 +7,7 @@ import { ShoppingCart, Truck, Gift, MessageCircle, AlertCircle, User, Phone, Map
 import confetti from 'canvas-confetti';
 import { Order, PRODUCTS, calculateTotal, calculateTotalSavings, getMinOrderWarning, formatPriceEn, getUnitPrice, getDiscountPercentage, getActiveTier } from '@/lib/calculations';
 import { getOrderWhatsAppLink, BKASH_NUMBER, CustomerInfo } from '@/lib/whatsapp';
+import { pushToDataLayer } from '@/lib/gtm';
 
 interface OrderSummaryProps {
     order: Order;
@@ -383,7 +384,21 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
                                 whileHover={{ scale: isFormValid ? 1.02 : 1 }}
                                 whileTap={{ scale: isFormValid ? 0.98 : 1 }}
                                 onClick={(e) => {
-                                    if (!isFormValid) e.preventDefault();
+                                    if (!isFormValid) {
+                                        e.preventDefault();
+                                        return;
+                                    }
+                                    pushToDataLayer({
+                                        event: 'begin_checkout',
+                                        value: total,
+                                        currency: 'BDT',
+                                        items: orderItems.map(product => ({
+                                            item_id: product.id,
+                                            item_name: product.nameEn,
+                                            price: getUnitPrice(product, order[product.id]),
+                                            quantity: order[product.id],
+                                        })),
+                                    });
                                 }}
                                 className={`mt-6 sm:mt-8 w-full flex items-center justify-center gap-2 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all ${
                                     isFormValid
